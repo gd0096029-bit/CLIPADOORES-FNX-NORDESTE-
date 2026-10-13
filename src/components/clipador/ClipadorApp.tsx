@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import type { Account, Clip, ClipadorData, PixKey, Platform } from "@/lib/clipador/types";
 import { activeWarnings, daysLeftInMonth, prizeForPosition, PRIZES } from "@/lib/clipador/rules";
 import { fmtBRL, fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
-import { IconAt, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "./icons";
+import { IconAt, IconBook, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "./icons";
 import { CommunityTab } from "./CommunityTab";
+import { ManualTab } from "./ManualTab";
 import { Backdrop } from "./Backdrop";
 import { Topbar } from "./Topbar";
 import { AccountModal } from "./AccountModal";
@@ -54,7 +55,7 @@ function reducer(state: ClipadorData, action: ClipadorAction): ClipadorData {
   }
 }
 
-type Tab = "ranking" | "clipadores" | "clipes" | "contas" | "advertencias";
+type Tab = "ranking" | "clipadores" | "clipes" | "contas" | "advertencias" | "manual";
 
 export interface ClipadorAppProps {
   initialData: ClipadorData;
@@ -132,6 +133,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode; badge?: React.ReactNode }> = [
     { id: "ranking", label: "Ranking", icon: <IconTrophy /> },
     { id: "clipadores", label: "Clipadores", icon: <IconUsers /> },
+    { id: "manual", label: "Manual", icon: <IconBook /> },
     { id: "clipes", label: "Meus clipes", icon: <IconScissors />, badge: <span className="count">{fmtInt(derived.monthClips.length)}</span> },
     {
       id: "contas",
@@ -248,6 +250,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
               }}
             />
           )}
+          {tab === "manual" && <ManualTab onOpenRules={() => setRulesOpen(true)} />}
           {tab === "clipadores" && (
             <CommunityTab community={derived.community} meId={data.me.id} selectedId={selectedClipper} onSelect={setSelectedClipper} />
           )}
