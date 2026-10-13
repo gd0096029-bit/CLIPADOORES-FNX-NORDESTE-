@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Account, PixKey, Platform } from "@/lib/clipador/types";
 import { isValidHandle, normalizeHandle, PLATFORM_LABEL, PLATFORMS, profileUrl } from "@/lib/clipador/platforms";
-import { IconAt, IconBank, IconCheck, IconClock, IconExternal, IconPlus, IconX, PlatformIcon } from "./icons";
+import { IconAt, IconBank, IconCheck, IconLock, IconClock, IconExternal, IconPlus, IconX, PlatformIcon } from "./icons";
 
 interface Props {
   accounts: Account[];
@@ -139,7 +139,7 @@ export function AccountsTab({ accounts, pix, mode, onAdd, onRemove, onConnect, o
   );
 }
 
-function PixForm({ pix, onSave }: { pix?: PixKey; onSave: (p: PixKey) => void }) {
+export function PixForm({ pix, onSave, bare }: { pix?: PixKey; onSave: (p: PixKey) => void; bare?: boolean }) {
   const [type, setType] = useState<PixKey["type"]>(pix?.type ?? "cpf");
   const [value, setValue] = useState(pix?.value ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -155,18 +155,26 @@ function PixForm({ pix, onSave }: { pix?: PixKey; onSave: (p: PixKey) => void })
   }
 
   return (
-    <div className="subpanel">
-      <div className="panel-title">
-        <span className="panel-icon tone-green">
-          <IconBank />
-        </span>
-        <h2>
-          Chave Pix <span className="muted-inline">· pra receber seus prêmios</span>
-        </h2>
-      </div>
+    <div className={bare ? "pix-form" : "subpanel pix-form"} id={bare ? undefined : "chave-pix"}>
+      {!bare && (
+        <div className="panel-title">
+          <span className="panel-icon tone-green">
+            <IconBank />
+          </span>
+          <h2>
+            Chave Pix <span className="muted-inline">· pra receber seus prêmios</span>
+          </h2>
+        </div>
+      )}
       <p className="panel-desc">
         É pra essa chave que a equipe manda o prêmio se você ficar entre os premiados (pago até o 5º dia útil do mês
         seguinte). Use uma chave no seu nome.
+      </p>
+      <p className="private-note">
+        <IconLock size={15} />
+        <span>
+          <b>Privada:</b> só você e a equipe da Fênix veem essa chave. Ela nunca aparece pros outros clipadores.
+        </span>
       </p>
       <form className="inline-form" onSubmit={submit} noValidate>
         <label className="select-wrap">

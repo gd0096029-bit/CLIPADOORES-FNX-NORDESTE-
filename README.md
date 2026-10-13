@@ -95,6 +95,7 @@ supabase/migrations/         estrutura do banco (SQL)
 Segurança, já incluída no SQL:
 - Cada clipador só vê os próprios clipes, contas e advertências. O ranking geral vem da função `get_ranking`.
 - Views, status e confirmação de conta só o servidor (service role) ou um admin alteram.
+- A chave Pix fica na tabela `clipper_pix` (migration `..._pix_privado.sql`): só o próprio clipador e a equipe (admin) leem ou mudam. Nenhuma função pública devolve a chave.
 - Tokens do login oficial ficam em `clipper_account_tokens`, sem acesso pelo navegador.
   Recomendado: criptografar antes de gravar (ex.: Supabase Vault ou AES com uma chave só do servidor).
 

@@ -18,8 +18,8 @@ export async function loadFromSupabase(supabase: SupabaseClient, clipperId: stri
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const monthDate = `${month}-01`;
 
-  const [me, clips, accounts, warnings, ranking, daily, payouts, allTime, lastRun] = await Promise.all([
-    supabase.from("clippers").select("id, name, pix_type, pix_key").eq("id", clipperId).single(),
+  const [me, clips, accounts, warnings, ranking, daily, payouts, allTime, lastRun, pixRow] = await Promise.all([
+    supabase.from("clippers").select("id, name").eq("id", clipperId).single(),
     supabase
       .from("clips")
       .select("id, platform, url, handle, title, submitted_at, views, views_yesterday, status, removal_reason, last_sync_at")
@@ -33,6 +33,8 @@ export async function loadFromSupabase(supabase: SupabaseClient, clipperId: stri
     supabase.from("payouts").select("amount, paid_at").eq("clipper_id", clipperId),
     supabase.from("clips").select("views, status").eq("clipper_id", clipperId),
     supabase.from("clips").select("last_sync_at").not("last_sync_at", "is", null).order("last_sync_at", { ascending: false }).limit(1),
+    // chave Pix fica numa tabela própria: só o dono e a equipe conseguem ler (RLS)
+    supabase.from("clipper_pix").select("pix_type, pix_key").eq("clipper_id", clipperId).maybeSingle(),
   ]);
 
   const firstError = [me, clips, accounts, warnings, ranking, daily, payouts, allTime].find((r) => r.error)?.error;
@@ -44,7 +46,8 @@ export async function loadFromSupabase(supabase: SupabaseClient, clipperId: stri
   const n = (v: unknown) => Number(v ?? 0);
 
   const meRow = me.data as Row;
-  const pix: PixKey | undefined = meRow.pix_type && meRow.pix_key ? { type: meRow.pix_type as PixKey["type"], value: String(meRow.pix_key) } : undefined;
+  const pixData = pixRow.data as Row | null;
+  const pix: PixKey | undefined = pixData ? { type: pixData.pix_type as PixKey["type"], value: String(pixData.pix_key) } : undefined;
   const all = rows(allTime);
   const pays = rows(payouts);
 

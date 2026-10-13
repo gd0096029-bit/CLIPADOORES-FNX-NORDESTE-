@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { IconLock, IconMail, IconPhone, IconUser } from "./icons";
+import type { PixKey } from "@/lib/clipador/types";
+import { IconBank, IconLock, IconMail, IconPhone, IconUser } from "./icons";
+import { PixForm } from "./AccountsTab";
 import { Modal } from "./Modal";
 import { isEmail, maskPhone, PasswordField, passwordError, TextField } from "./fields";
 
@@ -9,12 +11,16 @@ interface Props {
   name: string;
   email?: string;
   phone?: string;
+  pix?: PixKey;
+  onSavePix: (pix: PixKey) => void;
+  /** aba que abre primeiro */
+  initialSection?: "dados" | "senha" | "pix";
   onClose: () => void;
   onSaved: (message: string) => void;
 }
 
-export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", onClose, onSaved }: Props) {
-  const [section, setSection] = useState<"dados" | "senha">("dados");
+export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", pix, onSavePix, initialSection = "dados", onClose, onSaved }: Props) {
+  const [section, setSection] = useState<"dados" | "senha" | "pix">(initialSection);
   const [name, setName] = useState(n0);
   const [email, setEmail] = useState(e0);
   const [phone, setPhone] = useState(p0);
@@ -49,14 +55,20 @@ export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", onClose
       icon={<IconUser />}
       onClose={onClose}
       footer={
-        <>
+        section === "pix" ? (
           <button type="button" className="btn btn-outline" onClick={onClose}>
-            Cancelar
+            Fechar
           </button>
-          <button type="submit" form="account-form" className="btn btn-primary" disabled={saving}>
-            {saving ? "Salvando…" : "Salvar"}
-          </button>
-        </>
+        ) : (
+          <>
+            <button type="button" className="btn btn-outline" onClick={onClose}>
+              Cancelar
+            </button>
+            <button type="submit" form="account-form" className="btn btn-primary" disabled={saving}>
+              {saving ? "Salvando…" : "Salvar"}
+            </button>
+          </>
+        )
       }
     >
       <div className="seg" role="tablist" aria-label="Seções da conta">
@@ -68,7 +80,13 @@ export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", onClose
           <IconLock size={16} />
           Senha
         </button>
+        <button type="button" role="tab" aria-selected={section === "pix"} className={section === "pix" ? "is-active" : ""} onClick={() => setSection("pix")}>
+          <IconBank size={16} />
+          Chave Pix
+        </button>
       </div>
+      {section === "pix" && <PixForm pix={pix} onSave={onSavePix} bare />}
+      {section !== "pix" && (
       <form id="account-form" className="form" onSubmit={submit} noValidate>
         {section === "dados" ? (
           <>
@@ -93,6 +111,7 @@ export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", onClose
           </>
         )}
       </form>
+      )}
     </Modal>
   );
 }

@@ -75,7 +75,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   const [tab, setTab] = useState<Tab>("ranking");
   const [sendOpen, setSendOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState<false | "dados" | "pix">(false);
   const [selectedClipper, setSelectedClipper] = useState<string | null>(null);
   const [notices, setNotices] = useState<Notice[]>(() => {
     const list = [...(initialData.notices ?? [])];
@@ -191,7 +191,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
         name={data.me.name}
         area="clipador"
         canSwitch={mode === "demo"}
-        onAccount={() => setAccountOpen(true)}
+        onAccount={() => setAccountOpen("dados")}
         demo={mode === "demo"}
         bell={
           <NotificationsBell
@@ -249,7 +249,15 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
             tone="green"
             label="Prêmio se fechar hoje"
             value={derived.prize ? fmtBRLShort(derived.prize) : "R$ 0"}
-            foot={`Já recebido: ${fmtBRL(data.totals.paidOut)}`}
+            foot={
+              <>
+                Já recebido: {fmtBRL(data.totals.paidOut)}
+                <br />
+                <button type="button" className={`link pix-link ${data.pix ? "" : "is-missing"}`} onClick={() => setAccountOpen("pix")}>
+                  {data.pix ? "Minha chave Pix" : "Cadastrar chave Pix"}
+                </button>
+              </>
+            }
           />
         </section>
 
@@ -375,6 +383,12 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
 
       {accountOpen && (
         <AccountModal
+          initialSection={accountOpen}
+          pix={data.pix}
+          onSavePix={(pix) => {
+            dispatch({ type: "pix/save", pix });
+            setToast("Chave Pix salva.");
+          }}
           name={data.me.name}
           email={data.me.email}
           phone={data.me.phone}
