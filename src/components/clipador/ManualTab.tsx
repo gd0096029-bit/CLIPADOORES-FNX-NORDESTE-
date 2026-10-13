@@ -8,18 +8,16 @@ import {
   EXAMPLES,
   GOLDEN_RULES,
   HEAD_WHATSAPP,
-  MATERIALS_URL,
   STEPS,
   WARMUP,
 } from "@/lib/clipador/manual";
-import { FenixMark, IconAlert, IconBook, IconCheck, IconExternal, IconPhone } from "./icons";
+import { IconAlert, IconBook, IconCheck, IconPhone } from "./icons";
 
 const SECTIONS = [
   { id: "aquecer", label: "Aquecer conta" },
   { id: "passos", label: "Passo a passo" },
   { id: "checklist", label: "Checklist" },
   { id: "exemplos", label: "Exemplos" },
-  { id: "padrao", label: "Padrão visual" },
   { id: "regras", label: "Regras" },
 ];
 
@@ -39,7 +37,7 @@ export function ManualTab({ onOpenRules }: { onOpenRules: () => void }) {
         <h2 className="manual-title">
           Corta. Posta. <span className="gold">Converte.</span>
         </h2>
-        <p className="manual-lead">Tudo que o clipador da Fênix precisa num lugar só: como aquecer a conta, o passo a passo do corte e o padrão visual.</p>
+        <p className="manual-lead">Tudo que o clipador da Fênix precisa num lugar só: como aquecer a conta, o passo a passo do corte e as regras da competição.</p>
         <p className="manual-mission">A missão: o clipe dá o gostinho, o curso entrega o resto.</p>
         <nav className="manual-nav" aria-label="Seções do manual">
           {SECTIONS.map((s) => (
@@ -153,37 +151,6 @@ export function ManualTab({ onOpenRules }: { onOpenRules: () => void }) {
               </div>
             </article>
           ))}
-        </div>
-      </section>
-
-      {/* ---------- padrão visual ---------- */}
-      <section id="manual-padrao" className="manual-section">
-        <p className="eyebrow">Padrão visual</p>
-        <h3 className="manual-h">Todo clipe com a cara da Fênix</h3>
-        <div className="brand-kit">
-          <FenixMark size={88} />
-          <div className="brand-kit-text">
-            <strong>Logo</strong>
-            <span className="muted">Sempre no mesmo canto do vídeo. Palavra-chave da legenda em dourado.</span>
-            {MATERIALS_URL ? (
-              <a className="btn btn-outline btn-sm" href={MATERIALS_URL} target="_blank" rel="noopener noreferrer">
-                Baixar logo e materiais <IconExternal size={14} />
-              </a>
-            ) : (
-              <span className="placeholder">[LINK DA PASTA DE MATERIAIS]</span>
-            )}
-          </div>
-          <ul className="swatches" aria-label="Cores do padrão">
-            <li>
-              <span style={{ background: "#F2B33D" }} /> Dourado
-            </li>
-            <li>
-              <span style={{ background: "#0D0906" }} /> Preto
-            </li>
-            <li>
-              <span style={{ background: "#F3E7D3" }} /> Creme
-            </li>
-          </ul>
         </div>
       </section>
 

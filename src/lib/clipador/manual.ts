@@ -5,8 +5,6 @@
 
 /** Contato do head do time. Deixe vazio enquanto não tiver o número. Ex.: "https://wa.me/5581999999999" */
 export const HEAD_WHATSAPP = "";
-/** Pasta com logo e materiais (Drive etc.). Deixe vazio enquanto não tiver o link. */
-export const MATERIALS_URL = "";
 
 export const WARMUP = [
   {
@@ -45,7 +43,7 @@ export const STEPS = [
   },
   {
     title: "Legenda e identidade",
-    text: "Legenda grande, centralizada, no máximo 2 linhas, palavra-chave em dourado. Revisa o português. Logo da Fênix sempre no mesmo canto.",
+    text: "Legenda grande, centralizada, no máximo 2 linhas, com a palavra-chave em destaque. Revisa o português.",
   },
   {
     title: "Chamada pra ação",
@@ -126,7 +124,6 @@ export const CHECKLIST = [
   "Clipe entre 20 e 60 segundos, com começo, meio e fim",
   'Silêncios e "ééé" cortados',
   "Legenda revisada, sem erro de português",
-  "Logo da Fênix no canto e cores do padrão",
   "Chamada pra ação no final",
   "Cupom na tela, na descrição e no comentário fixado",
   "Informação de edital conferida na fonte oficial",
