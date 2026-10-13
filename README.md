@@ -16,10 +16,20 @@ npm install
 npm run dev
 ```
 
-Abra http://localhost:3000. Sem nenhuma configuração, o site abre em **modo demonstração**
-(dados fictícios, nada é salvo), então dá pra ver e testar todas as telas.
+Abra http://localhost:3000. O site roda em **modo demonstração**: dados fictícios, tudo funciona
+na tela e nada é salvo. A ligação com Supabase e Vercel fica pra depois (ver "Para quem vai colocar no ar").
 
-## O que tem
+## Páginas
+
+| Endereço | Tela |
+|---|---|
+| `/login` | Entrar (clipador ou equipe), com validação e mostrar/esconder senha |
+| `/cadastro` | Criar conta de clipador (nome, e-mail, WhatsApp, senha, aceite das regras) |
+| `/recuperar-senha` | Pedir link de nova senha |
+| `/clipador` | Área do clipador (abaixo) |
+| `/admin` | Painel da equipe (abaixo) |
+
+## Área do clipador
 
 | Aba / tela | O que faz |
 |---|---|
@@ -31,7 +41,19 @@ Abra http://localhost:3000. Sem nenhuma configuração, o site abre em **modo de
 | **Enviar clipe** | Reconhece o link (TikTok, Instagram, YouTube), limpa os parâmetros, bloqueia clipe repetido, link já removido e @ que não é seu |
 | **Regras** | Passo a passo e letra miúda |
 
-Funciona no celular, e os botões são acessíveis por teclado e leitor de tela.
+| **Minha conta** | Editar nome, e-mail e WhatsApp, e trocar a senha |
+
+## Painel da equipe
+
+| Aba | O que faz |
+|---|---|
+| **Resumo** | Clipadores ativos, clipes e views do mês, prêmios a pagar |
+| **Clipes** | Todos os clipes do mês com filtro por rede, clipador e status. Remover com motivo (avisa quando gera advertência automática) e restaurar |
+| **Clipadores** | Lista com posição, views e advertências. Filtros "perto da suspensão", "suspensos" e "sem Pix". Ficha com contato, contas, melhores clipes e histórico, mais os botões de dar advertência e suspender/reativar |
+| **Ranking e prêmios** | Prévia do mês atual e pagamentos do mês fechado: copiar chave Pix, marcar como pago, barra de progresso do total pago |
+| **Advertências** | Lista de ativas, anuladas e todas, com destaque pra quem está perto da suspensão. Anular com motivo |
+
+Tudo funciona no celular e por teclado.
 
 As regras (prêmios, advertências, prazos) estão todas em `src/lib/clipador/rules.ts`.
 Pra mudar a premiação, edite `PRIZES`.
@@ -44,13 +66,15 @@ src/
     clipador/page.tsx        página da área do clipador
     api/cron/sync/route.ts   sincronização de views (roda no Vercel Cron)
     globals.css              visual (cores e fontes no topo do arquivo)
-  components/clipador/       telas e componentes
+  components/clipador/       telas do clipador e de acesso (+ componentes comuns)
+  components/admin/          painel da equipe
   lib/clipador/
     types.ts                 formato dos dados
     rules.ts                 regras da competição
     platforms.ts             leitura dos links de TikTok / Instagram / YouTube
     data.ts                  carrega os dados (demo ou Supabase)
-    demo-data.ts             dados fictícios do modo demo
+    demo-data.ts             dados fictícios da área do clipador
+    admin-demo-data.ts       dados fictícios do painel da equipe
     providers/               APIs oficiais (YouTube, TikTok, Instagram)
 supabase/migrations/         estrutura do banco (SQL)
 ```

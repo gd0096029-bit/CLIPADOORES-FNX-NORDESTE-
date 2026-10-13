@@ -57,7 +57,7 @@ export interface PixKey {
 }
 
 export interface ClipadorData {
-  me: { id: string; name: string };
+  me: { id: string; name: string; email?: string; phone?: string };
   /** mês da competição, YYYY-MM */
   month: string;
   clips: Clip[];

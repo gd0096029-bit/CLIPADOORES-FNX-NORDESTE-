@@ -6,7 +6,7 @@ import { fmtBRLShort } from "@/lib/clipador/format";
 import { IconAlert, IconAt, IconBook, IconCheck, IconClock, IconEye, IconScissors, IconTrophy, IconX } from "./icons";
 import { Modal } from "./Modal";
 
-export function RulesModal({ onClose, onSend }: { onClose: () => void; onSend: () => void }) {
+export function RulesModal({ onClose, onSend }: { onClose: () => void; onSend?: () => void }) {
   const [tab, setTab] = useState<"como" | "regras">("como");
 
   return (
@@ -20,10 +20,12 @@ export function RulesModal({ onClose, onSend }: { onClose: () => void; onSend: (
           <button type="button" className="btn btn-outline" onClick={onClose}>
             Fechar
           </button>
-          <button type="button" className="btn btn-primary" onClick={onSend}>
-            <IconScissors />
-            Enviar clipe
-          </button>
+          {onSend && (
+            <button type="button" className="btn btn-primary" onClick={onSend}>
+              <IconScissors />
+              Enviar clipe
+            </button>
+          )}
         </>
       }
     >

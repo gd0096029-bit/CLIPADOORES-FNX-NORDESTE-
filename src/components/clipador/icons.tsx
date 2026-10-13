@@ -161,6 +161,71 @@ export const IconLink = (p: P) => (
   </Base>
 );
 
+export const IconEyeOff = (p: P) => (
+  <Base {...p}>
+    <path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-2.6 3.5M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7c1.9 0 3.6-.6 5-1.4" />
+    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M2 2l20 20" />
+  </Base>
+);
+export const IconMail = (p: P) => (
+  <Base {...p}>
+    <rect x="2" y="4" width="20" height="16" rx="3" />
+    <path d="m3 7 9 6 9-6" />
+  </Base>
+);
+export const IconLock = (p: P) => (
+  <Base {...p}>
+    <rect x="4" y="11" width="16" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </Base>
+);
+export const IconPhone = (p: P) => (
+  <Base {...p}>
+    <rect x="6" y="2" width="12" height="20" rx="3" />
+    <path d="M11 18h2" />
+  </Base>
+);
+export const IconCopy = (p: P) => (
+  <Base {...p}>
+    <rect x="9" y="9" width="12" height="12" rx="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </Base>
+);
+export const IconUsers = (p: P) => (
+  <Base {...p}>
+    <circle cx="9" cy="8" r="4" />
+    <path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3" />
+  </Base>
+);
+export const IconUndo = (p: P) => (
+  <Base {...p}>
+    <path d="M3 7v6h6" />
+    <path d="M21 17a9 9 0 0 0-15-6.7L3 13" />
+  </Base>
+);
+export const IconBan = (p: P) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="m4.9 4.9 14.2 14.2" />
+  </Base>
+);
+export const IconSwitch = (p: P) => (
+  <Base {...p}>
+    <path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" />
+  </Base>
+);
+export const IconCalendar = (p: P) => (
+  <Base {...p}>
+    <rect x="3" y="4" width="18" height="18" rx="3" />
+    <path d="M16 2v4M8 2v4M3 10h18" />
+  </Base>
+);
+export const IconFlag = (p: P) => (
+  <Base {...p}>
+    <path d="M4 22V4M4 4h12l-2 4 2 4H4" />
+  </Base>
+);
+
 /* Ícones das redes (traço simples, sem logos oficiais) */
 export const IconTikTok = (p: P) => (
   <Base {...p}>

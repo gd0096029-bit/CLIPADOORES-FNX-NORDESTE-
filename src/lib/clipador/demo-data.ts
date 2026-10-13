@@ -162,7 +162,7 @@ export function buildDemoData(now: Date = new Date()): ClipadorData {
   if (lastCheck > now) lastCheck.setDate(lastCheck.getDate() - 1);
 
   return {
-    me: { id: "me", name: "Lucas Andrade" },
+    me: { id: "me", name: "Lucas Andrade", email: "lucas.andrade@exemplo.com", phone: "(81) 99999-0000" },
     month,
     clips,
     accounts,

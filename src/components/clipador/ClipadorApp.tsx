@@ -4,20 +4,9 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import type { Account, Clip, ClipadorData, PixKey, Platform } from "@/lib/clipador/types";
 import { activeWarnings, daysLeftInMonth, prizeForPosition, PRIZES } from "@/lib/clipador/rules";
 import { fmtBRL, fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
-import {
-  FenixMark,
-  IconAt,
-  IconEye,
-  IconFilm,
-  IconLogout,
-  IconMedal,
-  IconPlus,
-  IconScissors,
-  IconShield,
-  IconTrophy,
-  IconUser,
-  IconWallet,
-} from "./icons";
+import { IconAt, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconWallet } from "./icons";
+import { Topbar } from "./Topbar";
+import { AccountModal } from "./AccountModal";
 import { RankingTab } from "./RankingTab";
 import { ClipsTab } from "./ClipsTab";
 import { AccountsTab } from "./AccountsTab";
@@ -82,6 +71,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   const [tab, setTab] = useState<Tab>("ranking");
   const [sendOpen, setSendOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const dispatch = useCallback(
@@ -148,35 +138,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
 
   return (
     <div className="app">
-      <header className="topbar">
-        <div className="topbar-inner">
-          <a className="brand" href="#" aria-label="Fênix Clipadores — início">
-            <FenixMark />
-            <span>
-              Fênix <span className="brand-sep">·</span> Clipadores
-            </span>
-          </a>
-          <nav className="topbar-actions" aria-label="Conta">
-            <span className="me">
-              <IconUser size={16} />
-              <span className="me-name">{data.me.name}</span>
-            </span>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTab("contas")}>
-              Minha conta
-            </button>
-            <button type="button" className="btn btn-ghost btn-sm" aria-label="Sair">
-              <IconLogout size={16} />
-              <span className="hide-sm">Sair</span>
-            </button>
-          </nav>
-        </div>
-      </header>
-
-      {mode === "demo" && (
-        <div className="demo-banner" role="note">
-          Modo demonstração: nomes, @ e números são fictícios. Nada do que você fizer aqui é salvo.
-        </div>
-      )}
+      <Topbar name={data.me.name} area="clipador" canSwitch={mode === "demo"} onAccount={() => setAccountOpen(true)} demo={mode === "demo"} />
 
       <main className="container">
         {/* ---------- resumo ---------- */}
@@ -333,6 +295,19 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
           onSend={() => {
             setRulesOpen(false);
             setSendOpen(true);
+          }}
+        />
+      )}
+
+      {accountOpen && (
+        <AccountModal
+          name={data.me.name}
+          email={data.me.email}
+          phone={data.me.phone}
+          onClose={() => setAccountOpen(false)}
+          onSaved={(msg) => {
+            setAccountOpen(false);
+            setToast(msg);
           }}
         />
       )}
