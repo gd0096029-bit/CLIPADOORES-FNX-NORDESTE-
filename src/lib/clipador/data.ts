@@ -79,6 +79,8 @@ export async function loadFromSupabase(supabase: SupabaseClient, clipperId: stri
       createdAt: String(w.created_at),
       annulled: w.annulled_reason ? { reason: String(w.annulled_reason) } : undefined,
     })),
+    // TODO (quando ligar o banco): função SQL que devolve os clipes válidos do mês de todos os clipadores
+    community: [],
     ranking: rows(ranking).map((r) => ({ clipperId: String(r.clipper_id), name: String(r.name), views: n(r.views), clips: n(r.clips) })),
     dailyViews: rows(daily).map((d): DailyViews => ({ date: String(d.day), views: n(d.views) })),
     pix,

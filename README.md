@@ -35,6 +35,7 @@ na tela e nada é salvo. A ligação com Supabase e Vercel fica pra depois (ver 
 |---|---|
 | **Resumo** | Clipes e views do mês (com o ganho desde ontem), sua posição, quanto falta pro próximo lugar e o prêmio se o mês fechasse hoje |
 | **Ranking** | Ranking do mês com barra de progresso, faixa de prêmios, linha de corte do último premiado e destaque "você" |
+| **Clipadores** | Lista de todos os clipadores do mês; ao escolher um, aparecem os @ e os links de todos os clipes dele, com as views, filtro por rede e ordenação. Também abre clicando no nome no ranking |
 | **Meus clipes** | Gráfico de views por dia, filtro por rede e por status, busca, ordenação, "mostrar mais", excluir com confirmação |
 | **Minhas contas** | Cadastro dos @ e confirmação pelo login oficial da rede; chave Pix com validação por tipo |
 | **Advertências** | Medidor 0–3, quando vem a próxima advertência automática e o histórico (ativa / anulada / vencida) |

@@ -12,9 +12,11 @@ interface Props {
   position: number;
   nextGoal: { views: number; position: number; prize: number } | null;
   onOpenRules: () => void;
+  /** abre os clipes do clipador na aba "Clipadores" */
+  onSelectClipper?: (clipperId: string) => void;
 }
 
-export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, position, nextGoal, onOpenRules }: Props) {
+export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, position, nextGoal, onOpenRules, onSelectClipper }: Props) {
   const leader = ranking[0]?.views || 1;
   const prizeCount = PRIZES.length;
 
@@ -78,7 +80,13 @@ export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, positi
               <span className={`rank-pos pos-${pos <= 3 ? pos : "n"}`}>{pos}º</span>
               <div className="rank-main">
                 <div className="rank-name">
-                  {e.name}
+                  {onSelectClipper ? (
+                    <button type="button" className="name-btn" onClick={() => onSelectClipper(e.clipperId)} aria-label={`Ver clipes de ${e.name}`}>
+                      {e.name}
+                    </button>
+                  ) : (
+                    e.name
+                  )}
                   {isMe && <span className="you">você</span>}
                 </div>
                 <div className="rank-bar" aria-hidden="true">
@@ -95,7 +103,7 @@ export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, positi
           );
         })}
       </ol>
-      <p className="hint">A linha tracejada marca o último lugar premiado.</p>
+      <p className="hint">A linha tracejada marca o último lugar premiado. Toque num nome pra ver os clipes da pessoa.</p>
     </div>
   );
 }

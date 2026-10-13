@@ -46,6 +46,23 @@ export interface RankingEntry {
   clips: number;
 }
 
+/** Clipe visível pros outros clipadores (só os que estão valendo) */
+export interface PublicClip {
+  id: string;
+  platform: Platform;
+  url: string;
+  handle?: string;
+  title?: string;
+  submittedAt: string;
+  views: number;
+}
+
+export interface CommunityClipper {
+  clipperId: string;
+  name: string;
+  clips: PublicClip[];
+}
+
 export interface DailyViews {
   date: string; // YYYY-MM-DD
   views: number;
@@ -64,6 +81,8 @@ export interface ClipadorData {
   accounts: Account[];
   warnings: Warning[];
   ranking: RankingEntry[];
+  /** clipes de todos os clipadores do mês, agrupados por clipador (aba "Clipadores") */
+  community: CommunityClipper[];
   dailyViews: DailyViews[];
   pix?: PixKey;
   totals: {

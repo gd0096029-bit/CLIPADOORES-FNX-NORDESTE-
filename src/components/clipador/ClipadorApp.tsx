@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import type { Account, Clip, ClipadorData, PixKey, Platform } from "@/lib/clipador/types";
 import { activeWarnings, daysLeftInMonth, prizeForPosition, PRIZES } from "@/lib/clipador/rules";
 import { fmtBRL, fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
-import { IconAt, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconWallet } from "./icons";
+import { IconAt, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "./icons";
+import { CommunityTab } from "./CommunityTab";
 import { Topbar } from "./Topbar";
 import { AccountModal } from "./AccountModal";
 import { RankingTab } from "./RankingTab";
@@ -52,7 +53,7 @@ function reducer(state: ClipadorData, action: ClipadorAction): ClipadorData {
   }
 }
 
-type Tab = "ranking" | "clipes" | "contas" | "advertencias";
+type Tab = "ranking" | "clipadores" | "clipes" | "contas" | "advertencias";
 
 export interface ClipadorAppProps {
   initialData: ClipadorData;
@@ -72,6 +73,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   const [sendOpen, setSendOpen] = useState(false);
   const [rulesOpen, setRulesOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [selectedClipper, setSelectedClipper] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const dispatch = useCallback(
@@ -111,7 +113,14 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
       nextGoal = { views: above.views - monthViews + 1, position: target + 1, prize: prizeForPosition(target + 1) };
     }
 
-    return { monthClips, counting, monthViews, viewsToday, ranking, position, prize, nextGoal };
+    // clipes de todo mundo, na ordem do ranking (os meus sempre atualizados)
+    const myPublic = counting.map(({ id, platform, url, handle, title, submittedAt, views }) => ({ id, platform, url, handle, title, submittedAt, views }));
+    const byId = new Map(data.community.map((c) => [c.clipperId, c]));
+    const community = ranking.map((e) =>
+      e.clipperId === data.me.id ? { clipperId: e.clipperId, name: e.name, clips: myPublic } : (byId.get(e.clipperId) ?? { clipperId: e.clipperId, name: e.name, clips: [] }),
+    );
+
+    return { monthClips, counting, monthViews, viewsToday, ranking, position, prize, nextGoal, community };
   }, [data]);
 
   const warningsActive = activeWarnings(data.warnings).length;
@@ -121,6 +130,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
 
   const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode; badge?: React.ReactNode }> = [
     { id: "ranking", label: "Ranking", icon: <IconTrophy /> },
+    { id: "clipadores", label: "Clipadores", icon: <IconUsers /> },
     { id: "clipes", label: "Meus clipes", icon: <IconScissors />, badge: <span className="count">{fmtInt(derived.monthClips.length)}</span> },
     {
       id: "contas",
@@ -230,7 +240,14 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
               nextGoal={derived.nextGoal}
               position={derived.position}
               onOpenRules={() => setRulesOpen(true)}
+              onSelectClipper={(id) => {
+                setSelectedClipper(id);
+                setTab("clipadores");
+              }}
             />
+          )}
+          {tab === "clipadores" && (
+            <CommunityTab community={derived.community} meId={data.me.id} selectedId={selectedClipper} onSelect={setSelectedClipper} />
           )}
           {tab === "clipes" && (
             <ClipsTab

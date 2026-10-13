@@ -4,7 +4,7 @@
  * do clipador sem banco de dados. Quando o Supabase estiver ligado, estes dados
  * são substituídos pelos reais (ver README → "Ligando o banco").
  */
-import type { Account, Clip, ClipadorData, DailyViews, Platform, RankingEntry, Warning } from "./types";
+import type { Account, Clip, ClipadorData, CommunityClipper, DailyViews, Platform, PublicClip, RankingEntry, Warning } from "./types";
 
 /** gerador pseudo-aleatório com semente, pra a demo ser igual em toda renderização */
 function rng(seed: number) {
@@ -115,6 +115,48 @@ export function buildDemoData(now: Date = new Date()): ClipadorData {
   ranking.push({ clipperId: "me", name: "Lucas Andrade", views: myViews, clips: clips.filter((c) => c.status !== "removido").length });
   ranking.sort((a, b) => b.views - a.views);
 
+  // ---- clipes de todo mundo (aba "Clipadores") ----
+  const community: CommunityClipper[] = ranking.map((e) => {
+    if (e.clipperId === "me") {
+      return {
+        clipperId: "me",
+        name: e.name,
+        clips: clips
+          .filter((c) => c.status !== "removido")
+          .map(({ id, platform, url, handle, title, submittedAt, views }) => ({ id, platform, url, handle, title, submittedAt, views })),
+      };
+    }
+    const base = e.name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z]+/g, "");
+    const weights = Array.from({ length: e.clips }, () => Math.pow(r(), 3) + 0.02);
+    const wsum = weights.reduce((a, b) => a + b, 0);
+    const list: PublicClip[] = weights.map((w, k) => {
+      const roll = r();
+      const platform: Platform = roll < 0.65 ? "tiktok" : roll < 0.85 ? "instagram" : "youtube";
+      const handle = platform === "tiktok" ? `${base}.cortes` : base;
+      const id = platform === "tiktok" ? String(7_400_000_000_000_000_000 + Math.floor(r() * 1e15)) : fakeId(r, 11);
+      return {
+        id: `${e.clipperId}-${k}`,
+        platform,
+        handle,
+        url:
+          platform === "tiktok"
+            ? `https://www.tiktok.com/@${handle}/video/${id}`
+            : platform === "instagram"
+              ? `https://www.instagram.com/reel/${id}/`
+              : `https://www.youtube.com/shorts/${id}`,
+        title: r() < 0.7 ? TITLES[Math.floor(r() * TITLES.length)] : undefined,
+        submittedAt: new Date(monthStart.getTime() + elapsedMs * r()).toISOString(),
+        views: Math.round((w / wsum) * e.views),
+      };
+    });
+    list.sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+    return { clipperId: e.clipperId, name: e.name, clips: list };
+  });
+
   // ---- views por dia ----
   const dailyViews: DailyViews[] = [];
   const today = now.getDate();
@@ -168,6 +210,7 @@ export function buildDemoData(now: Date = new Date()): ClipadorData {
     accounts,
     warnings,
     ranking,
+    community,
     dailyViews,
     pix: { type: "email", value: "lucas.andrade@exemplo.com" },
     totals: {
