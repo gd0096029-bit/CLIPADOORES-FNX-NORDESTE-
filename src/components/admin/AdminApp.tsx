@@ -6,6 +6,7 @@ import type { WarningKind } from "@/lib/clipador/types";
 import { activeWarnings, daysLeftInMonth, PRIZES, REMOVALS_PER_WARNING, SUSPENSION_MONTHS, WARNINGS_LIMIT } from "@/lib/clipador/rules";
 import { fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
 import { IconEye, IconFilm, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "@/components/clipador/icons";
+import { Backdrop } from "@/components/clipador/Backdrop";
 import { Topbar } from "@/components/clipador/Topbar";
 import { AdminClips } from "./AdminClips";
 import { AdminClippers } from "./AdminClippers";
@@ -157,6 +158,7 @@ export function AdminApp({ initialData }: { initialData: AdminData }) {
 
   return (
     <div className="app">
+      <Backdrop />
       <Topbar name={data.me.name} area="equipe" canSwitch demo />
 
       <main className="container">

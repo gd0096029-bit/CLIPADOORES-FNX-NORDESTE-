@@ -6,6 +6,7 @@ import { activeWarnings, daysLeftInMonth, prizeForPosition, PRIZES } from "@/lib
 import { fmtBRL, fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
 import { IconAt, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "./icons";
 import { CommunityTab } from "./CommunityTab";
+import { Backdrop } from "./Backdrop";
 import { Topbar } from "./Topbar";
 import { AccountModal } from "./AccountModal";
 import { RankingTab } from "./RankingTab";
@@ -148,6 +149,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
 
   return (
     <div className="app">
+      <Backdrop />
       <Topbar name={data.me.name} area="clipador" canSwitch={mode === "demo"} onAccount={() => setAccountOpen(true)} demo={mode === "demo"} />
 
       <main className="container">

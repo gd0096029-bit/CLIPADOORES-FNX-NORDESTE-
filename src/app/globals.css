@@ -2753,3 +2753,40 @@ html {
     white-space: nowrap;
   }
 }
+
+/* =========================================================
+   Fundo de sertão (áreas logadas)
+   ========================================================= */
+.app {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--bg);
+}
+.backdrop svg {
+  position: absolute;
+  inset: -24px;
+  width: calc(100% + 48px);
+  height: calc(100% + 48px);
+  filter: blur(7px);
+  opacity: 0.9;
+}
+/* cartões levemente translúcidos pra serra aparecer por trás */
+.stat,
+.panel {
+  background: rgba(26, 18, 12, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.tab:not(.is-active),
+.btn-outline,
+.btn-ghost {
+  background: rgba(26, 18, 12, 0.78);
+}
