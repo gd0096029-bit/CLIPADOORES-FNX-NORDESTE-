@@ -253,16 +253,8 @@ export function PlatformIcon({ platform, ...p }: P & { platform: Platform }) {
   return <IconYouTube {...p} />;
 }
 
-/** Marca: chama estilizada */
-export function FenixMark({ size = 36 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 36 36" aria-hidden="true" focusable="false">
-      <rect width="36" height="36" rx="10" fill="var(--accent)" />
-      <path
-        d="M18 7c1.2 3.6 5.8 6 5.8 11.2A5.8 5.8 0 0 1 18 24a5.8 5.8 0 0 1-5.8-5.8c0-2.3 1.2-3.8 2.4-4.9.1 1.8.9 3 2.1 3.5C16 13.6 17 10 18 7Z"
-        fill="#fff"
-      />
-      <path d="M12 27.5h12" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  );
+/** Logo da Fênix (public/logo-fenix.png) */
+export function FenixMark({ size = 40 }: { size?: number }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/logo-fenix.png" alt="" width={size} height={size} className="brand-logo" style={{ width: size, height: size }} />;
 }

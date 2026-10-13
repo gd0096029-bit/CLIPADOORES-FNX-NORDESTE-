@@ -19,14 +19,20 @@ export function AuthScreen({ mode }: { mode: Mode }) {
   return (
     <div className="auth">
       <aside className="auth-hero">
+        <Sky />
         <a className="brand brand-light" href="/login">
           <FenixMark />
           <span>
-            Fênix <span className="brand-sep">·</span> Clipadores
+            Fênix <span className="brand-sep">Clipadores</span>
           </span>
         </a>
         <div className="auth-hero-body">
-          <h1>Transforme seus cortes da Fênix em prêmio.</h1>
+          <p className="auth-eyebrow">TIME DE CLIPADORES · FÊNIX PM</p>
+          <h1>
+            Corta. Posta.
+            <br />
+            <span className="gold">Ganha.</span>
+          </h1>
           <p>Poste clipes, envie o link e acompanhe suas views. Todo mês os {PRIZES.length} melhores dividem {fmtBRLShort(total)} via Pix.</p>
           <ul className="auth-points">
             <li>
@@ -241,5 +247,48 @@ function RecoverForm() {
         </a>
       </p>
     </form>
+  );
+}
+
+/** Pôr do sol no sertão, o mesmo cenário do "QG dos Clipadores" */
+function Sky() {
+  return (
+    <svg className="auth-sky" aria-hidden="true" viewBox="0 0 720 900" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#1C0B05" />
+          <stop offset="0.38" stopColor="#6B2309" />
+          <stop offset="0.64" stopColor="#D9631F" />
+          <stop offset="0.78" stopColor="#F6A740" />
+        </linearGradient>
+        <radialGradient id="brilho" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#FFE2A0" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#F6A740" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="sombra" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#0D0906" stopOpacity="0.55" />
+          <stop offset="0.45" stopColor="#0D0906" stopOpacity="0.1" />
+          <stop offset="1" stopColor="#0D0906" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <rect width="720" height="900" fill="url(#ceu)" />
+      <circle cx="500" cy="660" r="230" fill="url(#brilho)" />
+      <circle cx="500" cy="660" r="84" fill="#FFD789" />
+      <path d="M0 660 L90 610 L180 640 L280 590 L380 630 L470 595 L560 640 L640 585 L720 615 L720 900 L0 900 Z" fill="#5A220C" opacity="0.85" />
+      <path d="M0 710 L130 680 L250 705 L360 670 L500 712 L620 684 L720 705 L720 900 L0 900 Z" fill="#2B1209" />
+      <g fill="#140904">
+        <rect x="80" y="640" width="14" height="100" rx="7" />
+        <rect x="58" y="672" width="11" height="40" rx="5.5" />
+        <rect x="58" y="704" width="28" height="11" rx="5.5" />
+        <rect x="104" y="660" width="11" height="44" rx="5.5" />
+        <rect x="88" y="694" width="27" height="11" rx="5.5" />
+        <rect x="610" y="680" width="11" height="70" rx="5.5" />
+        <rect x="626" y="694" width="9" height="26" rx="4.5" />
+        <rect x="614" y="714" width="21" height="9" rx="4.5" />
+      </g>
+      <path d="M560 330 q12 -10 24 0 q12 -10 24 0" stroke="#1C0B05" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <path d="M0 780 L160 752 L320 790 L470 760 L620 795 L720 770 L720 900 L0 900 Z" fill="#100805" />
+      <rect width="720" height="900" fill="url(#sombra)" />
+    </svg>
   );
 }

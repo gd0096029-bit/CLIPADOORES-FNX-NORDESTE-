@@ -18,7 +18,7 @@ export function Topbar({ name, area, canSwitch, onAccount, demo }: Props) {
           <a className="brand" href={area === "clipador" ? "/clipador" : "/admin"} aria-label="Fênix Clipadores — início">
             <FenixMark />
             <span>
-              Fênix <span className="brand-sep">·</span> {area === "clipador" ? "Clipadores" : "Equipe"}
+              Fênix <span className="brand-sep">{area === "clipador" ? "Clipadores" : "Equipe"}</span>
             </span>
           </a>
           <nav className="topbar-actions" aria-label="Conta">
