@@ -5,6 +5,7 @@ import type { AdminClip, AdminClipper } from "@/lib/clipador/admin-demo-data";
 import type { ClipStatus, Platform } from "@/lib/clipador/types";
 import { PLATFORM_LABEL, PLATFORMS } from "@/lib/clipador/platforms";
 import { fmtDateTime, fmtInt } from "@/lib/clipador/format";
+import { downloadCsv } from "@/lib/clipador/csv";
 import { IconClock, IconExternal, IconEye, IconScissors, IconSearch, IconTrash, IconUndo, PlatformIcon } from "@/components/clipador/icons";
 import type { AdminAction } from "./AdminApp";
 import { RemoveClipModal } from "./AdminModals";
@@ -55,6 +56,18 @@ export function AdminClips({ clips, clippers, onAction }: Props) {
           </span>
           <h2>Clipes do mês</h2>
         </div>
+        <button
+          type="button"
+          className="btn btn-outline btn-sm"
+          onClick={() =>
+            downloadCsv("clipes-do-mes.csv", [
+              ["Enviado em", "Clipador", "Rede", "@", "Título", "Link", "Views", "Status", "Motivo da remoção"],
+              ...filtered.map((c) => [fmtDateTime(c.submittedAt), names.get(c.clipperId)?.name ?? "", PLATFORM_LABEL[c.platform], c.handle ?? "", c.title ?? "", c.url, c.views, STATUS_LABEL[c.status], c.removalReason ?? ""]),
+            ])
+          }
+        >
+          Exportar planilha
+        </button>
       </div>
       <p className="panel-desc">Todo clipe enviado já conta. Confira os mais recentes e remova os que quebrarem as regras: o clipador vê o motivo.</p>
 
@@ -142,7 +155,7 @@ export function AdminClips({ clips, clippers, onAction }: Props) {
                   <tr key={c.id} className={c.status === "removido" ? "is-removed" : ""}>
                     <td>
                       <div className="clip-cell">
-                        <span className="plat">
+                        <span className={`plat plat-${c.platform}`}>
                           <PlatformIcon platform={c.platform} size={16} />
                         </span>
                         <div className="clip-text">

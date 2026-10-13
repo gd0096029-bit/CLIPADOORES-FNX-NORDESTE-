@@ -126,3 +126,5 @@ export function parseClipUrl(input: string): ParsedClipUrl {
 
   return { ok: false, error: "Aceitamos só links do TikTok, Instagram e YouTube." };
 }
+
+export const PIX_TYPE_LABEL = { cpf: "CPF", email: "E-mail", telefone: "Telefone", aleatoria: "Chave aleatória" } as const;

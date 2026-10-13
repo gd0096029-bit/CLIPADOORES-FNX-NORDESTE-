@@ -6,6 +6,7 @@ import { fmtBRLShort } from "@/lib/clipador/format";
 import { FenixMark, IconCheck, IconEye, IconLock, IconMail, IconPhone, IconScissors, IconTrophy, IconUser } from "./icons";
 import { isEmail, maskPhone, PasswordField, passwordError, TextField } from "./fields";
 import { RulesModal } from "./RulesModal";
+import { TermsModal } from "./TermsModal";
 
 type Mode = "login" | "cadastro" | "recuperar";
 
@@ -123,6 +124,7 @@ function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [rules, setRules] = useState(false);
+  const [terms, setTerms] = useState(false);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -175,11 +177,15 @@ function SignupForm() {
       <label className="check-label accept">
         <input type="checkbox" checked={accept} onChange={(e) => setAccept(e.target.checked)} aria-invalid={!!errors.accept} />
         <span>
-          Li e aceito as{" "}
+          Li e aceito os{" "}
+          <button type="button" className="link" onClick={() => setTerms(true)}>
+            Termos de participação
+          </button>{" "}
+          e as{" "}
           <button type="button" className="link" onClick={() => setRules(true)}>
             regras da competição
-          </button>{" "}
-          e autorizo a Fênix a repostar meus clipes.
+          </button>
+          , e autorizo a Fênix a repostar meus clipes.
         </span>
       </label>
       {errors.accept && <p className="field-error">{errors.accept}</p>}
@@ -194,6 +200,15 @@ function SignupForm() {
       </p>
     </form>
     {rules && <RulesModal onClose={() => setRules(false)} />}
+    {terms && (
+      <TermsModal
+        onClose={() => setTerms(false)}
+        onAccept={() => {
+          setAccept(true);
+          setTerms(false);
+        }}
+      />
+    )}
     </>
   );
 }

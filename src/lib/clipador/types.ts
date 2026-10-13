@@ -73,6 +73,15 @@ export interface PixKey {
   value: string;
 }
 
+export interface MonthResult {
+  month: string; // YYYY-MM
+  position: number;
+  views: number;
+  clips: number;
+  prize: number;
+  paid: boolean;
+}
+
 /** Aviso que aparece no sininho do topo */
 export interface Notice {
   id: string;
@@ -86,7 +95,7 @@ export interface Notice {
 }
 
 export interface ClipadorData {
-  me: { id: string; name: string; email?: string; phone?: string };
+  me: { id: string; name: string; email?: string; phone?: string; /** foto de perfil (URL ou data:) */ avatar?: string };
   /** mês da competição, YYYY-MM */
   month: string;
   clips: Clip[];
@@ -104,6 +113,10 @@ export interface ClipadorData {
     paidOut: number;
     pending: number;
   };
+  /** resultado dos meses anteriores (mais recente primeiro) */
+  history?: MonthResult[];
+  /** cupom de desconto do clipador e vendas feitas com ele */
+  coupon?: { code: string; discount: string; salesMonth: number; salesTotal: number };
   /** avisos do sininho */
   notices?: Notice[];
   /** última vez que as views foram conferidas */

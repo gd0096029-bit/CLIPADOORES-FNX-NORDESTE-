@@ -19,7 +19,7 @@ const SECTIONS = [
 ];
 
 /** Aba "Manual": o conteúdo do QG dos Clipadores dentro do site. */
-export function ManualTab({ onOpenRules }: { onOpenRules: () => void }) {
+export function ManualTab({ onOpenRules, onOpenTerms }: { onOpenRules: () => void; onOpenTerms: () => void }) {
   function jump(id: string) {
     document.getElementById(`manual-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -146,9 +146,14 @@ export function ManualTab({ onOpenRules }: { onOpenRules: () => void }) {
             </li>
           ))}
         </ul>
-        <button type="button" className="btn btn-outline btn-sm" onClick={onOpenRules}>
-          <IconBook size={16} /> Ver resumo das regras e prêmios
-        </button>
+        <div className="manual-btns">
+          <button type="button" className="btn btn-outline btn-sm" onClick={onOpenRules}>
+            <IconBook size={16} /> Ver resumo das regras e prêmios
+          </button>
+          <button type="button" className="btn btn-outline btn-sm" onClick={onOpenTerms}>
+            <IconBook size={16} /> Ler os Termos de participação
+          </button>
+        </div>
       </section>
 
       <section className="manual-golden">

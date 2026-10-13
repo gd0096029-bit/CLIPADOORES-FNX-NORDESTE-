@@ -7,6 +7,10 @@ import { fmtBRL, fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "
 import { IconAt, IconBook, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "./icons";
 import { CommunityTab } from "./CommunityTab";
 import { ManualTab } from "./ManualTab";
+import { PerformanceTab } from "./PerformanceTab";
+import { Countdown } from "./bits";
+import { FirstSteps } from "./FirstSteps";
+import { TermsModal } from "./TermsModal";
 import { NotificationsBell } from "./NotificationsBell";
 import { Backdrop } from "./Backdrop";
 import { Topbar } from "./Topbar";
@@ -28,7 +32,8 @@ export type ClipadorAction =
   | { type: "account/add"; account: Account }
   | { type: "account/remove"; id: string }
   | { type: "account/connect"; platform: Platform; handle: string }
-  | { type: "pix/save"; pix: PixKey };
+  | { type: "pix/save"; pix: PixKey }
+  | { type: "me/avatar"; src: string };
 
 function reducer(state: ClipadorData, action: ClipadorAction): ClipadorData {
   switch (action.type) {
@@ -51,12 +56,14 @@ function reducer(state: ClipadorData, action: ClipadorAction): ClipadorData {
           a.platform === action.platform && a.handle === action.handle ? { ...a, connection: "oauth" } : a,
         ),
       };
+    case "me/avatar":
+      return { ...state, me: { ...state.me, avatar: action.src } };
     case "pix/save":
       return { ...state, pix: action.pix };
   }
 }
 
-type Tab = "ranking" | "clipadores" | "clipes" | "contas" | "advertencias" | "manual";
+type Tab = "ranking" | "clipadores" | "clipes" | "desempenho" | "contas" | "advertencias" | "manual";
 
 export interface ClipadorAppProps {
   initialData: ClipadorData;
@@ -77,6 +84,8 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   const [rulesOpen, setRulesOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState<false | "dados" | "pix">(false);
   const [selectedClipper, setSelectedClipper] = useState<string | null>(null);
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [stepsHidden, setStepsHidden] = useState(false);
   const [notices, setNotices] = useState<Notice[]>(() => {
     const list = [...(initialData.notices ?? [])];
     const left = daysLeftInMonth(initialData.month);
@@ -170,9 +179,10 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
     { id: "clipadores", label: "Clipadores", icon: <IconUsers /> },
     { id: "manual", label: "Manual", icon: <IconBook /> },
     { id: "clipes", label: "Meus clipes", icon: <IconScissors />, badge: <span className="count">{fmtInt(derived.monthClips.length)}</span> },
+    { id: "desempenho", label: "Desempenho", icon: <IconMedal /> },
     {
       id: "contas",
-      label: "Minhas contas",
+      label: "Contas",
       icon: <IconAt />,
       badge: pendingAccounts ? <span className="dot dot-amber" aria-label={`${pendingAccounts} conta aguardando confirmação`} /> : undefined,
     },
@@ -189,6 +199,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
       <Backdrop />
       <Topbar
         name={data.me.name}
+        avatar={data.me.avatar}
         area="clipador"
         canSwitch={mode === "demo"}
         onAccount={() => setAccountOpen("dados")}
@@ -263,10 +274,29 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
 
         <div className="checked-line">
           <span className="pulse" aria-hidden="true" />
-          Views conferidas {fmtRelativeDay(data.lastCheckAt)} · o mês fecha em {plural(daysLeft, "dia", "dias")}
+          Views conferidas {fmtRelativeDay(data.lastCheckAt)} · <Countdown month={data.month} />
         </div>
 
         {/* ---------- abas ---------- */}
+        {!stepsHidden && (
+          <FirstSteps
+            onDismiss={() => setStepsHidden(true)}
+            steps={[
+              { id: "conta", label: "Cadastrar o @ onde você posta", done: data.accounts.length > 0, cta: "Cadastrar", action: () => setTab("contas") },
+              {
+                id: "confirmar",
+                label: "Confirmar todas as suas contas",
+                done: data.accounts.length > 0 && data.accounts.every((a) => a.connection === "oauth"),
+                cta: "Confirmar",
+                action: () => setTab("contas"),
+              },
+              { id: "pix", label: "Cadastrar a chave Pix pra receber prêmios", done: !!data.pix, cta: "Cadastrar Pix", action: () => setAccountOpen("pix") },
+              { id: "foto", label: "Colocar uma foto de perfil", done: !!data.me.avatar, cta: "Pôr foto", action: () => setAccountOpen("dados") },
+              { id: "clipe", label: "Enviar o primeiro clipe", done: data.clips.length > 0, cta: "Enviar", action: () => setSendOpen(true) },
+            ]}
+          />
+        )}
+
         <div className="tabs-row">
           <div className="tabs" role="tablist" aria-label="Seções">
             {tabs.map((t) => (
@@ -303,15 +333,26 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
               nextGoal={derived.nextGoal}
               position={derived.position}
               onOpenRules={() => setRulesOpen(true)}
+              meAvatar={data.me.avatar}
               onSelectClipper={(id) => {
                 setSelectedClipper(id);
                 setTab("clipadores");
               }}
             />
           )}
-          {tab === "manual" && <ManualTab onOpenRules={() => setRulesOpen(true)} />}
+          {tab === "desempenho" && (
+            <PerformanceTab
+              data={data}
+              monthClips={derived.counting}
+              monthViews={derived.monthViews}
+              position={derived.position}
+              activeWarnings={warningsActive}
+              onToast={setToast}
+            />
+          )}
+          {tab === "manual" && <ManualTab onOpenRules={() => setRulesOpen(true)} onOpenTerms={() => setTermsOpen(true)} />}
           {tab === "clipadores" && (
-            <CommunityTab community={derived.community} meId={data.me.id} selectedId={selectedClipper} onSelect={setSelectedClipper} />
+            <CommunityTab community={derived.community} meId={data.me.id} meAvatar={data.me.avatar} selectedId={selectedClipper} onSelect={setSelectedClipper} />
           )}
           {tab === "clipes" && (
             <ClipsTab
@@ -349,6 +390,10 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
           Prêmios pagos via Pix até o 5º dia útil do mês seguinte.{" "}
           <button type="button" className="link" onClick={() => setRulesOpen(true)}>
             Ver regras
+          </button>{" "}
+          ·{" "}
+          <button type="button" className="link" onClick={() => setTermsOpen(true)}>
+            Termos de participação
           </button>
         </footer>
       </main>
@@ -381,8 +426,15 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
         />
       )}
 
+      {termsOpen && <TermsModal onClose={() => setTermsOpen(false)} />}
+
       {accountOpen && (
         <AccountModal
+          avatar={data.me.avatar}
+          onSaveAvatar={(src) => {
+            dispatch({ type: "me/avatar", src });
+            setToast("Foto atualizada.");
+          }}
           initialSection={accountOpen}
           pix={data.pix}
           onSavePix={(pix) => {

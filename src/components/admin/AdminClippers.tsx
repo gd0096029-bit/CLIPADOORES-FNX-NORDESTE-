@@ -94,6 +94,9 @@ export function AdminClippers({ clippers, stats, clips, warnings, suspensionMont
                 <th scope="col" className="num">
                   Views no mês
                 </th>
+                <th scope="col" className="num">
+                  Vendas (cupom)
+                </th>
                 <th scope="col">Advertências</th>
                 <th scope="col">Situação</th>
                 <th scope="col">
@@ -125,6 +128,10 @@ export function AdminClippers({ clippers, stats, clips, warnings, suspensionMont
                     </td>
                     <td className="num" data-label="Views">
                       <b>{fmtInt(s.views)}</b>
+                    </td>
+                    <td className="num" data-label="Vendas">
+                      <b>{c.coupon?.salesMonth ?? 0}</b>
+                      {c.coupon && <span className="clip-meta coupon-code">{c.coupon.code}</span>}
                     </td>
                     <td data-label="Advertências">
                       <WarnDots n={s.activeWarnings} />
@@ -268,6 +275,10 @@ function ClipperSheet({
         <div className="sheet-stat">
           <span>Clipes válidos</span>
           <b>{fmtInt(stats.clips)}</b>
+        </div>
+        <div className="sheet-stat">
+          <span>Vendas com cupom</span>
+          <b>{clipper.coupon?.salesMonth ?? 0}</b>
         </div>
         <div className="sheet-stat">
           <span>Removidos (total)</span>

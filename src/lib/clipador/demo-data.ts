@@ -223,6 +223,17 @@ export function buildDemoData(now: Date = new Date()): ClipadorData {
       pending: 0,
     },
     lastCheckAt: lastCheck.toISOString(),
+    history: [1, 2, 3].map((back, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - back, 1);
+      const m = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const res = [
+        { position: 4, views: 183_097, clips: 61, prize: 1000 },
+        { position: 9, views: 98_420, clips: 44, prize: 0 },
+        { position: 3, views: 214_880, clips: 72, prize: 1500 },
+      ][i];
+      return { month: m, ...res, paid: res.prize > 0 };
+    }),
+    coupon: { code: "LUCAS10", discount: "10% de desconto", salesMonth: 7, salesTotal: 23 },
     notices: [
       { id: "n1", kind: "subiu", title: "Você subiu pro 4º lugar", body: "Passou a Larissa Prado. Mais 39 mil views e você chega no 3º.", createdAt: ago(2), read: false, tab: "ranking" },
       { id: "n2", kind: "marca", title: "Seu clipe passou de 10 mil views", body: "Bastidores do aulão Fênix (YouTube).", createdAt: ago(5), read: false, tab: "clipes" },

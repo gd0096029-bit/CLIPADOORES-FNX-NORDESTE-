@@ -44,14 +44,17 @@ na tela e nada é salvo. A ligação com Supabase e Vercel fica pra depois (ver 
 
 | **Minha conta** | Editar nome, e-mail e WhatsApp, e trocar a senha |
 
+**Também na área do clipador:** pódio do top 3, aba **Desempenho** (cupom com vendas, histórico dos meses e conquistas), aba **Manual** (conteúdo do QG dos Clipadores), sininho de avisos, contagem regressiva pro fechamento, cartão de primeiros passos, foto de perfil, chave Pix privada e Termos de participação.
+
 ## Painel da equipe
 
 | Aba | O que faz |
 |---|---|
 | **Resumo** | Clipadores ativos, clipes e views do mês, prêmios a pagar |
+| **Conferir** | Fila dos clipes novos que a equipe ainda não olhou, com "Tá OK" e "Remover" |
 | **Clipes** | Todos os clipes do mês com filtro por rede, clipador e status. Remover com motivo (avisa quando gera advertência automática) e restaurar |
 | **Clipadores** | Lista com posição, views e advertências. Filtros "perto da suspensão", "suspensos" e "sem Pix". Ficha com contato, contas, melhores clipes e histórico, mais os botões de dar advertência e suspender/reativar |
-| **Ranking e prêmios** | Prévia do mês atual e pagamentos do mês fechado: copiar chave Pix, marcar como pago, barra de progresso do total pago |
+| **Ranking e prêmios** | Pódio, botão **Fechar o mês** (congela o ranking e gera os pagamentos), exportar planilha, prévia do mês atual e pagamentos do mês fechado: copiar chave Pix, marcar como pago, barra de progresso do total pago |
 | **Advertências** | Lista de ativas, anuladas e todas, com destaque pra quem está perto da suspensão. Anular com motivo |
 
 Tudo funciona no celular e por teclado.

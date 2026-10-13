@@ -15,9 +15,10 @@ interface Props {
   onOpenRules: () => void;
   /** abre os clipes do clipador na aba "Clipadores" */
   onSelectClipper?: (clipperId: string) => void;
+  meAvatar?: string;
 }
 
-export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, position, nextGoal, onOpenRules, onSelectClipper }: Props) {
+export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, position, nextGoal, onOpenRules, onSelectClipper, meAvatar }: Props) {
   const leader = ranking[0]?.views || 1;
   const prizeCount = PRIZES.length;
 
@@ -70,7 +71,7 @@ export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, positi
         </div>
       )}
 
-      <Podium ranking={ranking} meId={meId} onSelect={onSelectClipper} />
+      <Podium ranking={ranking} meId={meId} onSelect={onSelectClipper} avatars={{ [meId]: meAvatar }} />
 
       {ranking.length > 3 && <h3 className="list-title">Do 4º lugar em diante</h3>}
       <ol className="ranking" start={4}>

@@ -5,6 +5,7 @@ import type { CommunityClipper, Platform, PublicClip } from "@/lib/clipador/type
 import { PLATFORM_LABEL, PLATFORMS, profileUrl } from "@/lib/clipador/platforms";
 import { fmtDateTime, fmtInt, plural } from "@/lib/clipador/format";
 import { IconExternal, IconEye, IconSearch, IconUsers, PlatformIcon } from "./icons";
+import { Avatar } from "./bits";
 
 const PAGE = 20;
 
@@ -14,13 +15,14 @@ interface Props {
   /** clipador aberto (os clipes dele aparecem dentro do nome) */
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  meAvatar?: string;
 }
 
 /**
  * Aba "Clipadores": cada clipador é um bloco com o nome dele.
  * Ao clicar no nome, os links dos clipes daquela pessoa abrem ali dentro, com as views.
  */
-export function CommunityTab({ community, meId, selectedId, onSelect }: Props) {
+export function CommunityTab({ community, meId, selectedId, onSelect, meAvatar }: Props) {
   const [q, setQ] = useState("");
 
   const people = useMemo(() => {
@@ -58,6 +60,7 @@ export function CommunityTab({ community, meId, selectedId, onSelect }: Props) {
               key={p.clipperId}
               person={p}
               isMe={p.clipperId === meId}
+              avatar={p.clipperId === meId ? meAvatar : undefined}
               open={p.clipperId === selectedId}
               onToggle={() => onSelect(p.clipperId === selectedId ? null : p.clipperId)}
             />
@@ -73,9 +76,11 @@ function PersonBlock({
   isMe,
   open,
   onToggle,
+  avatar,
 }: {
   person: CommunityClipper & { position: number; views: number };
   isMe: boolean;
+  avatar?: string;
   open: boolean;
   onToggle: () => void;
 }) {
@@ -91,6 +96,7 @@ function PersonBlock({
     <li ref={ref} className={`person-block ${open ? "is-open" : ""} ${isMe ? "is-me" : ""}`}>
       <button type="button" className="person-head" aria-expanded={open} aria-controls={bodyId} onClick={onToggle}>
         <span className={`community-pos pos-${person.position <= 3 ? person.position : "n"}`}>{person.position}º</span>
+        <Avatar name={person.name} src={avatar} size={40} />
         <span className="person-head-text">
           <span className="community-name">
             {person.name}
@@ -186,7 +192,7 @@ function PersonClips({ clips: all }: { clips: PublicClip[] }) {
         <ol className="link-list">
           {clips.slice(0, limit).map((c) => (
             <li key={c.id}>
-              <span className="plat">
+              <span className={`plat plat-${c.platform}`}>
                 <PlatformIcon platform={c.platform} size={16} />
               </span>
               <div className="clip-text">

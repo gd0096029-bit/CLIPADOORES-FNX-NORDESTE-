@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useReducer, useState } from "react";
-import type { AdminData } from "@/lib/clipador/admin-demo-data";
+import type { AdminData, Payout } from "@/lib/clipador/admin-demo-data";
 import type { WarningKind } from "@/lib/clipador/types";
 import { activeWarnings, daysLeftInMonth, PRIZES, REMOVALS_PER_WARNING, SUSPENSION_MONTHS, WARNINGS_LIMIT } from "@/lib/clipador/rules";
 import { fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
-import { IconEye, IconFilm, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "@/components/clipador/icons";
+import { IconEye, IconFilm, IconFlag, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "@/components/clipador/icons";
 import { Backdrop } from "@/components/clipador/Backdrop";
 import { Topbar } from "@/components/clipador/Topbar";
 import { NotificationsBell } from "@/components/clipador/NotificationsBell";
@@ -14,6 +14,9 @@ import { AdminClips } from "./AdminClips";
 import { AdminClippers } from "./AdminClippers";
 import { AdminRanking } from "./AdminRanking";
 import { AdminWarnings } from "./AdminWarnings";
+import { AdminReview } from "./AdminReview";
+import { CloseMonthModal } from "./CloseMonthModal";
+import { Countdown } from "@/components/clipador/bits";
 
 /* ------------------------------------------------------------------ */
 /* Estado (modo demo: tudo fica só na tela)                            */
@@ -26,7 +29,10 @@ export type AdminAction =
   | { type: "warning/annul"; id: string; reason: string }
   | { type: "clipper/suspend"; id: string; until: string }
   | { type: "clipper/unsuspend"; id: string }
-  | { type: "payout/pay"; clipperId: string };
+  | { type: "payout/pay"; clipperId: string }
+  | { type: "clip/approve"; id: string }
+  | { type: "clip/approve-all" }
+  | { type: "month/close"; payouts: Payout[] };
 
 function reducer(s: AdminData, a: AdminAction): AdminData {
   const now = new Date().toISOString();
@@ -51,7 +57,7 @@ function reducer(s: AdminData, a: AdminAction): AdminData {
       return {
         ...s,
         warnings,
-        clips: s.clips.map((c) => (c.id === a.id ? { ...c, status: "removido", removalReason: a.reason } : c)),
+        clips: s.clips.map((c) => (c.id === a.id ? { ...c, status: "removido", removalReason: a.reason, reviewed: true } : c)),
         clippers: s.clippers.map((c) => (c.id === clipper.id ? { ...c, removedAllTime: removed } : c)),
       };
     }
@@ -75,6 +81,12 @@ function reducer(s: AdminData, a: AdminAction): AdminData {
       return { ...s, clippers: s.clippers.map((c) => (c.id === a.id ? { ...c, suspendedUntil: a.until } : c)) };
     case "clipper/unsuspend":
       return { ...s, clippers: s.clippers.map((c) => (c.id === a.id ? { ...c, suspendedUntil: undefined } : c)) };
+    case "clip/approve":
+      return { ...s, clips: s.clips.map((c) => (c.id === a.id ? { ...c, reviewed: true } : c)) };
+    case "clip/approve-all":
+      return { ...s, clips: s.clips.map((c) => (c.status !== "removido" ? { ...c, reviewed: true } : c)) };
+    case "month/close":
+      return { ...s, prevMonth: s.month, prevPayouts: a.payouts, closed: { month: s.month, at: now } };
     case "payout/pay":
       return { ...s, prevPayouts: s.prevPayouts.map((p) => (p.clipperId === a.clipperId ? { ...p, paidAt: now } : p)) };
   }
@@ -87,11 +99,12 @@ export interface ClipperStats {
   activeWarnings: number;
 }
 
-type Tab = "clipes" | "clipadores" | "ranking" | "advertencias";
+type Tab = "conferir" | "clipes" | "clipadores" | "ranking" | "advertencias";
 
 export function AdminApp({ initialData }: { initialData: AdminData }) {
   const [data, dispatchRaw] = useReducer(reducer, initialData);
-  const [tab, setTab] = useState<Tab>("clipes");
+  const [tab, setTab] = useState<Tab>("conferir");
+  const [closing, setClosing] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [notices, setNotices] = useState<Notice[]>(initialData.notices ?? []);
 
@@ -151,8 +164,10 @@ export function AdminApp({ initialData }: { initialData: AdminData }) {
   const atRisk = data.clippers.filter((c) => (derived.stats.get(c.id)?.activeWarnings ?? 0) >= WARNINGS_LIMIT - 1 && !c.suspendedUntil).length;
   const pendingReview = derived.monthClips.filter((c) => c.status === "verificando").length;
   const mName = monthName(data.month);
+  const toReview = derived.monthClips.filter((c) => !c.reviewed && c.status !== "removido").length;
 
   const tabs: Array<{ id: Tab; label: string; icon: React.ReactNode; badge?: React.ReactNode }> = [
+    { id: "conferir", label: "Conferir", icon: <IconFlag />, badge: toReview ? <span className="count count-alert">{fmtInt(toReview)}</span> : undefined },
     { id: "clipes", label: "Clipes", icon: <IconScissors />, badge: <span className="count">{fmtInt(derived.monthClips.length)}</span> },
     { id: "clipadores", label: "Clipadores", icon: <IconUsers />, badge: <span className="count">{fmtInt(data.clippers.length)}</span> },
     { id: "ranking", label: "Ranking e prêmios", icon: <IconTrophy />, badge: unpaid.length ? <span className="dot dot-amber" aria-label={`${unpaid.length} prêmios a pagar`} /> : undefined },
@@ -211,7 +226,7 @@ export function AdminApp({ initialData }: { initialData: AdminData }) {
 
         <div className="checked-line">
           <span className="pulse" aria-hidden="true" />
-          Views conferidas {fmtRelativeDay(data.lastCheckAt)} · o mês fecha em {plural(daysLeftInMonth(data.month), "dia", "dias")} · prêmios do mês:{" "}
+          Views conferidas {fmtRelativeDay(data.lastCheckAt)} · {data.closed?.month === data.month ? "mês fechado" : <Countdown month={data.month} />} · prêmios do mês:{" "}
           {fmtBRLShort(PRIZES.reduce((a, b) => a + b, 0))}
         </div>
 
@@ -237,14 +252,48 @@ export function AdminApp({ initialData }: { initialData: AdminData }) {
         </div>
 
         <section className="panel" role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
+          {tab === "conferir" && <AdminReview clips={derived.monthClips} clippers={data.clippers} onAction={dispatch} />}
           {tab === "clipes" && <AdminClips clips={derived.monthClips} clippers={data.clippers} onAction={dispatch} />}
           {tab === "clipadores" && (
             <AdminClippers clippers={data.clippers} stats={derived.stats} clips={derived.monthClips} warnings={data.warnings} onAction={dispatch} suspensionMonths={SUSPENSION_MONTHS} />
           )}
-          {tab === "ranking" && <AdminRanking month={data.month} prevMonth={data.prevMonth} ranking={derived.ranking} payouts={data.prevPayouts} onAction={dispatch} onToast={setToast} />}
+          {tab === "ranking" && (
+            <AdminRanking
+              month={data.month}
+              prevMonth={data.prevMonth}
+              ranking={derived.ranking}
+              payouts={data.prevPayouts}
+              closed={data.closed}
+              onAction={dispatch}
+              onToast={setToast}
+              onCloseMonth={() => setClosing(true)}
+            />
+          )}
           {tab === "advertencias" && <AdminWarnings warnings={data.warnings} clippers={data.clippers} onAction={dispatch} />}
         </section>
       </main>
+
+      {closing && (
+        <CloseMonthModal
+          month={data.month}
+          ranking={derived.ranking}
+          daysLeft={daysLeftInMonth(data.month)}
+          noPix={data.clippers.filter((c) => !c.pix).map((c) => c.id)}
+          onClose={() => setClosing(false)}
+          onConfirm={() => {
+            const payouts: Payout[] = derived.ranking.slice(0, PRIZES.length).map((e, i) => ({
+              clipperId: e.clipperId,
+              name: e.name,
+              position: i + 1,
+              views: e.views,
+              amount: PRIZES[i],
+              pix: data.clippers.find((c) => c.id === e.clipperId)?.pix,
+            }));
+            dispatch({ type: "month/close", payouts }, `${mName[0].toUpperCase() + mName.slice(1)} fechado. Pagamentos gerados.`);
+            setClosing(false);
+          }}
+        />
+      )}
 
       <div className="toast-region" role="status" aria-live="polite">
         {toast && <div className="toast">{toast}</div>}

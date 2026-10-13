@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { PixKey } from "@/lib/clipador/types";
 import { IconBank, IconLock, IconMail, IconPhone, IconUser } from "./icons";
 import { PixForm } from "./AccountsTab";
+import { Avatar } from "./bits";
 import { Modal } from "./Modal";
 import { isEmail, maskPhone, PasswordField, passwordError, TextField } from "./fields";
 
@@ -13,13 +14,25 @@ interface Props {
   phone?: string;
   pix?: PixKey;
   onSavePix: (pix: PixKey) => void;
+  avatar?: string;
+  onSaveAvatar: (src: string) => void;
   /** aba que abre primeiro */
   initialSection?: "dados" | "senha" | "pix";
   onClose: () => void;
   onSaved: (message: string) => void;
 }
 
-export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", pix, onSavePix, initialSection = "dados", onClose, onSaved }: Props) {
+export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", pix, onSavePix, avatar, onSaveAvatar, initialSection = "dados", onClose, onSaved }: Props) {
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  async function pickPhoto(file?: File) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return setPhotoError("Escolha uma imagem (JPG ou PNG).");
+    if (file.size > 8 * 1024 * 1024) return setPhotoError("Imagem muito grande. Use uma de até 8 MB.");
+    setPhotoError(null);
+    onSaveAvatar(await squareThumb(file, 256));
+  }
+
   const [section, setSection] = useState<"dados" | "senha" | "pix">(initialSection);
   const [name, setName] = useState(n0);
   const [email, setEmail] = useState(e0);
@@ -90,6 +103,18 @@ export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", pix, on
       <form id="account-form" className="form" onSubmit={submit} noValidate>
         {section === "dados" ? (
           <>
+            <div className="photo-row">
+              <Avatar name={name || n0} src={avatar} size={72} />
+              <div className="photo-text">
+                <span className="field-label">Foto de perfil</span>
+                <span className="field-hint">Aparece no pódio, no ranking e na aba Clipadores.</span>
+                <label className="btn btn-outline btn-xs file-btn">
+                  {avatar ? "Trocar foto" : "Escolher foto"}
+                  <input type="file" accept="image/*" className="sr-only" onChange={(e) => pickPhoto(e.target.files?.[0])} />
+                </label>
+                {photoError && <p className="field-error">{photoError}</p>}
+              </div>
+            </div>
             <TextField label="Nome completo" value={name} onChange={setName} error={errors.name} autoComplete="name" icon={<IconUser size={18} />} hint="É o nome que aparece no ranking." />
             <TextField label="E-mail" type="email" value={email} onChange={setEmail} error={errors.email} autoComplete="email" icon={<IconMail size={18} />} />
             <TextField
@@ -114,4 +139,24 @@ export function AccountModal({ name: n0, email: e0 = "", phone: p0 = "", pix, on
       )}
     </Modal>
   );
+}
+
+/** Recorta a imagem no centro, em quadrado, e reduz pra não pesar. */
+function squareThumb(file: File, size: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const side = Math.min(img.width, img.height);
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("canvas"));
+      ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }

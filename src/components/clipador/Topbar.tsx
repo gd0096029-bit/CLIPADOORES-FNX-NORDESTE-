@@ -1,3 +1,4 @@
+import { Avatar } from "./bits";
 import { FenixMark, IconLock, IconLogout, IconSwitch, IconUser } from "./icons";
 
 interface Props {
@@ -9,9 +10,10 @@ interface Props {
   demo?: boolean;
   /** sininho de avisos */
   bell?: React.ReactNode;
+  avatar?: string;
 }
 
-export function Topbar({ name, area, canSwitch, onAccount, demo, bell }: Props) {
+export function Topbar({ name, area, canSwitch, onAccount, demo, bell, avatar }: Props) {
   const other = area === "clipador" ? { href: "/admin", label: "Painel da equipe" } : { href: "/clipador", label: "Área do clipador" };
   return (
     <>
@@ -26,7 +28,7 @@ export function Topbar({ name, area, canSwitch, onAccount, demo, bell }: Props) 
           <nav className="topbar-actions" aria-label="Conta">
             {bell}
             <span className="me">
-              <IconUser size={16} />
+              {avatar ? <Avatar name={name} src={avatar} size={26} /> : <IconUser size={16} />}
               <span className="me-name">{name}</span>
             </span>
             {canSwitch && (

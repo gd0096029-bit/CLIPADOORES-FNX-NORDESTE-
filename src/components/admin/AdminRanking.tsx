@@ -4,7 +4,9 @@ import { useState } from "react";
 import type { Payout } from "@/lib/clipador/admin-demo-data";
 import { PRIZES, prizeForPosition } from "@/lib/clipador/rules";
 import { fmtBRL, fmtBRLShort, fmtDateTime, fmtInt, monthLabel } from "@/lib/clipador/format";
-import { IconCheck, IconCopy, IconEye, IconTrophy, IconWallet } from "@/components/clipador/icons";
+import { downloadCsv } from "@/lib/clipador/csv";
+import { PIX_TYPE_LABEL } from "@/lib/clipador/platforms";
+import { IconCalendar, IconCheck, IconCopy, IconEye, IconLock, IconTrophy, IconWallet } from "@/components/clipador/icons";
 import type { AdminAction } from "./AdminApp";
 import { Podium } from "@/components/clipador/Podium";
 
@@ -13,11 +15,14 @@ interface Props {
   prevMonth: string;
   ranking: Array<{ clipperId: string; name: string; views: number; clips: number }>;
   payouts: Payout[];
+  closed?: { month: string; at: string };
   onAction: (a: AdminAction, message?: string) => void;
   onToast: (m: string) => void;
+  onCloseMonth: () => void;
 }
 
-export function AdminRanking({ month, prevMonth, ranking, payouts, onAction, onToast }: Props) {
+export function AdminRanking({ month, prevMonth, ranking, payouts, closed, onAction, onToast, onCloseMonth }: Props) {
+  const isClosed = closed?.month === month;
   const [view, setView] = useState<"atual" | "anterior">("atual");
   const leader = ranking[0]?.views || 1;
   const paid = payouts.filter((p) => p.paidAt).reduce((s, p) => s + p.amount, 0);
@@ -43,7 +48,8 @@ export function AdminRanking({ month, prevMonth, ranking, payouts, onAction, onT
         </div>
         <div className="seg seg-inline" role="tablist" aria-label="Mês">
           <button type="button" role="tab" aria-selected={view === "atual"} className={view === "atual" ? "is-active" : ""} onClick={() => setView("atual")}>
-            {monthLabel(month)} (parcial)
+            {monthLabel(month)}
+            {isClosed ? "" : " (parcial)"}
           </button>
           <button type="button" role="tab" aria-selected={view === "anterior"} className={view === "anterior" ? "is-active" : ""} onClick={() => setView("anterior")}>
             {monthLabel(prevMonth)}
@@ -53,7 +59,35 @@ export function AdminRanking({ month, prevMonth, ranking, payouts, onAction, onT
 
       {view === "atual" ? (
         <>
-          <p className="panel-desc">Prévia do mês em andamento. No fechamento, os {PRIZES.length} primeiros entram na lista de pagamentos.</p>
+          {isClosed ? (
+            <p className="check check-ok closed-banner">
+              <IconLock size={16} />
+              <span>
+                Mês fechado em {fmtDateTime(closed!.at)}. Ranking congelado e pagamentos gerados na aba ao lado.
+              </span>
+            </p>
+          ) : (
+            <div className="close-row">
+              <p className="panel-desc">Prévia do mês em andamento. No fechamento, os {PRIZES.length} primeiros entram na lista de pagamentos.</p>
+              <div className="panel-tools">
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  onClick={() =>
+                    downloadCsv(`ranking-${month}.csv`, [
+                      ["Posição", "Clipador", "Clipes", "Views", "Prêmio (R$)"],
+                      ...ranking.map((e, i) => [i + 1, e.name, e.clips, e.views, prizeForPosition(i + 1)]),
+                    ])
+                  }
+                >
+                  Exportar planilha
+                </button>
+                <button type="button" className="btn btn-primary btn-sm" onClick={onCloseMonth}>
+                  <IconCalendar size={16} /> Fechar o mês
+                </button>
+              </div>
+            </div>
+          )}
           <Podium ranking={ranking} />
           {ranking.length > 3 && <h3 className="list-title">Do 4º lugar em diante</h3>}
           <ol className="ranking" start={4}>
@@ -99,7 +133,21 @@ export function AdminRanking({ month, prevMonth, ranking, payouts, onAction, onT
               <span style={{ width: `${total ? (paid / total) * 100 : 0}%` }} />
             </div>
           </div>
-          <p className="panel-desc">Prazo: até o 5º dia útil. Copie a chave, faça o Pix no banco e marque como pago.</p>
+          <div className="close-row">
+            <p className="panel-desc">Prazo: até o 5º dia útil. Copie a chave, faça o Pix no banco e marque como pago.</p>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() =>
+                downloadCsv(`pagamentos-${prevMonth}.csv`, [
+                  ["Posição", "Clipador", "Views", "Valor (R$)", "Tipo de chave", "Chave Pix", "Situação"],
+                  ...payouts.map((p) => [p.position, p.name, p.views, p.amount, p.pix ? PIX_TYPE_LABEL[p.pix.type] : "", p.pix?.value ?? "", p.paidAt ? "Pago" : "A pagar"]),
+                ])
+              }
+            >
+              Exportar planilha
+            </button>
+          </div>
           <ul className="payouts">
             {payouts.map((p) => (
               <li key={p.clipperId} className={`payout ${p.paidAt ? "is-paid" : ""}`}>

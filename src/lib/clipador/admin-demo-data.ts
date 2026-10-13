@@ -14,10 +14,14 @@ export interface AdminClipper {
   pix?: PixKey;
   removedAllTime: number;
   suspendedUntil?: string; // YYYY-MM-DD
+  /** cupom do clipador e vendas no mês */
+  coupon?: { code: string; salesMonth: number };
 }
 
 export interface AdminClip extends Clip {
   clipperId: string;
+  /** já passou pela fila de conferência da equipe */
+  reviewed?: boolean;
 }
 
 export interface AdminWarning extends Warning {
@@ -44,6 +48,8 @@ export interface AdminData {
   prevPayouts: Payout[];
   notices?: Notice[];
   lastCheckAt: string;
+  /** quando o mês atual já foi fechado pela equipe */
+  closed?: { month: string; at: string };
 }
 
 function rng(seed: number) {
@@ -132,6 +138,7 @@ export function buildAdminDemoData(now: Date = new Date()): AdminData {
       accounts,
       pix: i === 10 ? undefined : { type: "email", value: `${s}@exemplo.com` },
       removedAllTime: removedBefore,
+      coupon: { code: `${s.slice(0, 6).toUpperCase()}10`, salesMonth: Math.round(weight * 3 + r() * 4) },
       suspendedUntil: i === 11 ? isoDate(new Date(now.getFullYear(), now.getMonth() + 2, 1)) : undefined,
     });
 
@@ -163,6 +170,7 @@ export function buildAdminDemoData(now: Date = new Date()): AdminData {
         views,
         viewsToday: fresh ? 0 : Math.round(views * (age < 2 ? 0.4 : 0.03 * r())),
         status: fresh ? "verificando" : removed ? "removido" : "no_ar",
+        reviewed: removed || age > 1.5,
         removalReason: removed ? "Fênix não é o assunto principal do clipe" : undefined,
         lastSyncAt: fresh ? undefined : noon.toISOString(),
       });
@@ -202,7 +210,7 @@ export function buildAdminDemoData(now: Date = new Date()): AdminData {
   const ago = (hours: number) => new Date(now.getTime() - hours * 3_600_000).toISOString();
   const notices: Notice[] = [
     { id: "a1", kind: "pagamento", title: "4 prêmios de setembro a pagar", body: "Prazo: 5º dia útil. Total de R$ 3.000.", createdAt: ago(3), read: false, tab: "ranking" },
-    { id: "a2", kind: "clipe", title: "11 clipes novos hoje", body: "Confira os mais recentes na aba Clipes.", createdAt: ago(1), read: false, tab: "clipes" },
+    { id: "a2", kind: "clipe", title: "Clipes novos pra conferir", body: "Veja a fila na aba Conferir.", createdAt: ago(1), read: false, tab: "conferir" },
     { id: "a3", kind: "advertencia", title: "Marina Teles está perto da suspensão", body: "2 de 3 advertências ativas.", createdAt: ago(20), read: false, tab: "advertencias" },
     { id: "a4", kind: "conta", title: "Novo clipador cadastrado", body: "Diego Farias criou a conta.", createdAt: ago(30), read: true, tab: "clipadores" },
     { id: "a5", kind: "removido", title: "Views suspeitas num clipe", body: "Um clipe de Rafael Moura ganhou 40 mil views em 1 hora.", createdAt: ago(50), read: true, tab: "clipes" },

@@ -8,12 +8,14 @@ interface Props {
   ranking: RankingEntry[];
   meId?: string;
   onSelect?: (clipperId: string) => void;
+  /** fotos por clipador */
+  avatars?: Record<string, string | undefined>;
 }
 
 const PLACE = ["", "1º", "2º", "3º"];
 
 /** Pódio do top 3: 2º à esquerda, 1º no meio (mais alto), 3º à direita. */
-export function Podium({ ranking, meId, onSelect }: Props) {
+export function Podium({ ranking, meId, onSelect, avatars = {} }: Props) {
   const top = ranking.slice(0, 3);
   if (top.length === 0) return null;
   const order = [top[1], top[0], top[2]].map((e, i) => (e ? { e, pos: [2, 1, 3][i] } : null));
@@ -32,7 +34,8 @@ export function Podium({ ranking, meId, onSelect }: Props) {
               </span>
             )}
             <span className="podium-avatar" aria-hidden="true">
-              {initials(e.name)}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {avatars[e.clipperId] ? <img src={avatars[e.clipperId]} alt="" /> : initials(e.name)}
             </span>
             <span className="podium-name">
               {e.name}
