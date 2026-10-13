@@ -1,7 +1,7 @@
 /**
  * DADOS DE DEMONSTRAÇÃO do painel da equipe. Tudo fictício.
  */
-import type { Account, Clip, PixKey, Platform, Warning } from "./types";
+import type { Account, Clip, Notice, PixKey, Platform, Warning } from "./types";
 import { PRIZES } from "./rules";
 
 export interface AdminClipper {
@@ -42,6 +42,7 @@ export interface AdminData {
   clips: AdminClip[];
   warnings: AdminWarning[];
   prevPayouts: Payout[];
+  notices?: Notice[];
   lastCheckAt: string;
 }
 
@@ -198,5 +199,14 @@ export function buildAdminDemoData(now: Date = new Date()): AdminData {
     paidAt: i < 3 ? new Date(now.getFullYear(), now.getMonth(), 3, 10, 15).toISOString() : undefined,
   }));
 
-  return { me: { name: "Equipe Fênix" }, month, prevMonth, clippers, clips, warnings, prevPayouts, lastCheckAt: noon.toISOString() };
+  const ago = (hours: number) => new Date(now.getTime() - hours * 3_600_000).toISOString();
+  const notices: Notice[] = [
+    { id: "a1", kind: "pagamento", title: "4 prêmios de setembro a pagar", body: "Prazo: 5º dia útil. Total de R$ 3.000.", createdAt: ago(3), read: false, tab: "ranking" },
+    { id: "a2", kind: "clipe", title: "11 clipes novos hoje", body: "Confira os mais recentes na aba Clipes.", createdAt: ago(1), read: false, tab: "clipes" },
+    { id: "a3", kind: "advertencia", title: "Marina Teles está perto da suspensão", body: "2 de 3 advertências ativas.", createdAt: ago(20), read: false, tab: "advertencias" },
+    { id: "a4", kind: "conta", title: "Novo clipador cadastrado", body: "Diego Farias criou a conta.", createdAt: ago(30), read: true, tab: "clipadores" },
+    { id: "a5", kind: "removido", title: "Views suspeitas num clipe", body: "Um clipe de Rafael Moura ganhou 40 mil views em 1 hora.", createdAt: ago(50), read: true, tab: "clipes" },
+  ];
+
+  return { me: { name: "Equipe Fênix" }, month, prevMonth, clippers, clips, warnings, prevPayouts, notices, lastCheckAt: noon.toISOString() };
 }

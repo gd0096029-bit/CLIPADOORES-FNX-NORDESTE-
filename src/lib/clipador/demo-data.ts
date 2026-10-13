@@ -203,6 +203,8 @@ export function buildDemoData(now: Date = new Date()): ClipadorData {
   const lastCheck = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
   if (lastCheck > now) lastCheck.setDate(lastCheck.getDate() - 1);
 
+  const ago = (hours: number) => new Date(now.getTime() - hours * 3_600_000).toISOString();
+
   return {
     me: { id: "me", name: "Lucas Andrade", email: "lucas.andrade@exemplo.com", phone: "(81) 99999-0000" },
     month,
@@ -221,5 +223,13 @@ export function buildDemoData(now: Date = new Date()): ClipadorData {
       pending: 0,
     },
     lastCheckAt: lastCheck.toISOString(),
+    notices: [
+      { id: "n1", kind: "subiu", title: "Você subiu pro 4º lugar", body: "Passou a Larissa Prado. Mais 39 mil views e você chega no 3º.", createdAt: ago(2), read: false, tab: "ranking" },
+      { id: "n2", kind: "marca", title: "Seu clipe passou de 10 mil views", body: "Bastidores do aulão Fênix (YouTube).", createdAt: ago(5), read: false, tab: "clipes" },
+      { id: "n3", kind: "conta", title: "@estudacomfenix ainda não foi confirmada", body: "Confirme a conta pra os clipes dela contarem.", createdAt: ago(1), read: false, tab: "contas" },
+      { id: "n4", kind: "removido", title: "Um clipe seu foi removido", body: "Motivo: a Fênix não é o assunto principal do clipe.", createdAt: ago(27), read: true, tab: "clipes" },
+      { id: "n5", kind: "pagamento", title: "Prêmio de setembro pago", body: "R$ 1.000 enviados via Pix pra sua chave cadastrada.", createdAt: ago(24 * 9), read: true },
+      { id: "n6", kind: "advertencia", title: "Você recebeu 1 advertência", body: "3 clipes removidos pela equipe. Você está com 1 de 3.", createdAt: ago(24 * 26), read: true, tab: "advertencias" },
+    ],
   };
 }

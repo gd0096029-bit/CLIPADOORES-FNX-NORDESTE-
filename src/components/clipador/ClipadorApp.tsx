@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
-import type { Account, Clip, ClipadorData, PixKey, Platform } from "@/lib/clipador/types";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import type { Account, Clip, ClipadorData, Notice, PixKey, Platform } from "@/lib/clipador/types";
 import { activeWarnings, daysLeftInMonth, prizeForPosition, PRIZES } from "@/lib/clipador/rules";
 import { fmtBRL, fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/clipador/format";
 import { IconAt, IconBook, IconEye, IconFilm, IconMedal, IconPlus, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "./icons";
 import { CommunityTab } from "./CommunityTab";
 import { ManualTab } from "./ManualTab";
+import { NotificationsBell } from "./NotificationsBell";
 import { Backdrop } from "./Backdrop";
 import { Topbar } from "./Topbar";
 import { AccountModal } from "./AccountModal";
@@ -76,6 +77,25 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   const [rulesOpen, setRulesOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [selectedClipper, setSelectedClipper] = useState<string | null>(null);
+  const [notices, setNotices] = useState<Notice[]>(() => {
+    const list = [...(initialData.notices ?? [])];
+    const left = daysLeftInMonth(initialData.month);
+    if (left <= 3) {
+      list.push({
+        id: "fechamento",
+        kind: "fechamento",
+        title: left <= 1 ? "O mês fecha hoje" : `Faltam ${left} dias pro fechamento`,
+        body: "Envie seus últimos clipes do mês antes do ranking congelar.",
+        createdAt: new Date().toISOString(),
+        read: false,
+        tab: "ranking",
+      });
+    }
+    return list;
+  });
+  const pushNotice = useCallback((n: Omit<Notice, "id" | "createdAt" | "read">) => {
+    setNotices((list) => [{ ...n, id: `n${Date.now()}${Math.random()}`, createdAt: new Date().toISOString(), read: false }, ...list]);
+  }, []);
   const [toast, setToast] = useState<string | null>(null);
 
   const dispatch = useCallback(
@@ -125,6 +145,21 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
     return { monthClips, counting, monthViews, viewsToday, ranking, position, prize, nextGoal, community };
   }, [data]);
 
+  // avisa quando a posição no ranking muda
+  const lastPos = useRef(derived.position);
+  useEffect(() => {
+    const prev = lastPos.current;
+    const cur = derived.position;
+    if (cur !== prev) {
+      lastPos.current = cur;
+      pushNotice(
+        cur < prev
+          ? { kind: "subiu", title: `Você subiu pro ${cur}º lugar`, body: derived.prize ? `Se o mês fechasse agora, seriam ${fmtBRLShort(derived.prize)}.` : undefined, tab: "ranking" }
+          : { kind: "caiu", title: `Você caiu pro ${cur}º lugar`, body: "Mande mais clipes pra recuperar a posição.", tab: "ranking" },
+      );
+    }
+  }, [derived.position, derived.prize, pushNotice]);
+
   const warningsActive = activeWarnings(data.warnings).length;
   const daysLeft = daysLeftInMonth(data.month);
   const pendingAccounts = data.accounts.filter((a) => a.connection === "manual").length;
@@ -152,7 +187,23 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
   return (
     <div className="app">
       <Backdrop />
-      <Topbar name={data.me.name} area="clipador" canSwitch={mode === "demo"} onAccount={() => setAccountOpen(true)} demo={mode === "demo"} />
+      <Topbar
+        name={data.me.name}
+        area="clipador"
+        canSwitch={mode === "demo"}
+        onAccount={() => setAccountOpen(true)}
+        demo={mode === "demo"}
+        bell={
+          <NotificationsBell
+            notices={notices}
+            onMarkAllRead={() => setNotices((l) => l.map((n) => ({ ...n, read: true })))}
+            onOpen={(n) => {
+              setNotices((l) => l.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+              if (n.tab) setTab(n.tab as Tab);
+            }}
+          />
+        }
+      />
 
       <main className="container">
         {/* ---------- resumo ---------- */}
@@ -308,6 +359,7 @@ export function ClipadorApp({ initialData, mode = "demo", onAction }: ClipadorAp
             setSendOpen(false);
             setTab("clipes");
             setToast("Clipe enviado! As views aparecem na próxima conferência.");
+            pushNotice({ kind: "clipe", title: "Clipe recebido", body: "Ele já está valendo. As views aparecem na próxima conferência.", tab: "clipes" });
           }}
         />
       )}

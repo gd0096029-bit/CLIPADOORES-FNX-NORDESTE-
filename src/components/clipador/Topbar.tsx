@@ -7,9 +7,11 @@ interface Props {
   canSwitch?: boolean;
   onAccount?: () => void;
   demo?: boolean;
+  /** sininho de avisos */
+  bell?: React.ReactNode;
 }
 
-export function Topbar({ name, area, canSwitch, onAccount, demo }: Props) {
+export function Topbar({ name, area, canSwitch, onAccount, demo, bell }: Props) {
   const other = area === "clipador" ? { href: "/admin", label: "Painel da equipe" } : { href: "/clipador", label: "Área do clipador" };
   return (
     <>
@@ -22,6 +24,7 @@ export function Topbar({ name, area, canSwitch, onAccount, demo }: Props) {
             </span>
           </a>
           <nav className="topbar-actions" aria-label="Conta">
+            {bell}
             <span className="me">
               <IconUser size={16} />
               <span className="me-name">{name}</span>

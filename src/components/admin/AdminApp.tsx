@@ -8,6 +8,8 @@ import { fmtBRLShort, fmtInt, fmtRelativeDay, monthName, plural } from "@/lib/cl
 import { IconEye, IconFilm, IconScissors, IconShield, IconTrophy, IconUsers, IconWallet } from "@/components/clipador/icons";
 import { Backdrop } from "@/components/clipador/Backdrop";
 import { Topbar } from "@/components/clipador/Topbar";
+import { NotificationsBell } from "@/components/clipador/NotificationsBell";
+import type { Notice } from "@/lib/clipador/types";
 import { AdminClips } from "./AdminClips";
 import { AdminClippers } from "./AdminClippers";
 import { AdminRanking } from "./AdminRanking";
@@ -91,6 +93,7 @@ export function AdminApp({ initialData }: { initialData: AdminData }) {
   const [data, dispatchRaw] = useReducer(reducer, initialData);
   const [tab, setTab] = useState<Tab>("clipes");
   const [toast, setToast] = useState<string | null>(null);
+  const [notices, setNotices] = useState<Notice[]>(initialData.notices ?? []);
 
   useEffect(() => {
     if (!toast) return;
@@ -159,7 +162,22 @@ export function AdminApp({ initialData }: { initialData: AdminData }) {
   return (
     <div className="app">
       <Backdrop />
-      <Topbar name={data.me.name} area="equipe" canSwitch demo />
+      <Topbar
+        name={data.me.name}
+        area="equipe"
+        canSwitch
+        demo
+        bell={
+          <NotificationsBell
+            notices={notices}
+            onMarkAllRead={() => setNotices((l) => l.map((n) => ({ ...n, read: true })))}
+            onOpen={(n) => {
+              setNotices((l) => l.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+              if (n.tab) setTab(n.tab as Tab);
+            }}
+          />
+        }
+      />
 
       <main className="container">
         <section className="stats" aria-label={`Resumo de ${mName}`}>

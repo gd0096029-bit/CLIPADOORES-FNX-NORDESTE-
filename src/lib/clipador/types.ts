@@ -73,6 +73,18 @@ export interface PixKey {
   value: string;
 }
 
+/** Aviso que aparece no sininho do topo */
+export interface Notice {
+  id: string;
+  kind: "subiu" | "caiu" | "removido" | "advertencia" | "fechamento" | "pagamento" | "conta" | "marca" | "clipe";
+  title: string;
+  body?: string;
+  createdAt: string;
+  read: boolean;
+  /** aba que abre ao clicar no aviso */
+  tab?: string;
+}
+
 export interface ClipadorData {
   me: { id: string; name: string; email?: string; phone?: string };
   /** mês da competição, YYYY-MM */
@@ -92,6 +104,8 @@ export interface ClipadorData {
     paidOut: number;
     pending: number;
   };
+  /** avisos do sininho */
+  notices?: Notice[];
   /** última vez que as views foram conferidas */
   lastCheckAt: string;
 }
