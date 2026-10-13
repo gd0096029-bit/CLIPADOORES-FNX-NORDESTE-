@@ -6,6 +6,7 @@ import { PRIZES, prizeForPosition } from "@/lib/clipador/rules";
 import { fmtBRL, fmtBRLShort, fmtDateTime, fmtInt, monthLabel } from "@/lib/clipador/format";
 import { IconCheck, IconCopy, IconEye, IconTrophy, IconWallet } from "@/components/clipador/icons";
 import type { AdminAction } from "./AdminApp";
+import { Podium } from "@/components/clipador/Podium";
 
 interface Props {
   month: string;
@@ -53,9 +54,11 @@ export function AdminRanking({ month, prevMonth, ranking, payouts, onAction, onT
       {view === "atual" ? (
         <>
           <p className="panel-desc">Prévia do mês em andamento. No fechamento, os {PRIZES.length} primeiros entram na lista de pagamentos.</p>
-          <ol className="ranking">
-            {ranking.map((e, i) => {
-              const pos = i + 1;
+          <Podium ranking={ranking} />
+          {ranking.length > 3 && <h3 className="list-title">Do 4º lugar em diante</h3>}
+          <ol className="ranking" start={4}>
+            {ranking.slice(3).map((e, i) => {
+              const pos = i + 4;
               const prize = prizeForPosition(pos);
               return (
                 <li key={e.clipperId} className={`rank-row ${pos === PRIZES.length ? "is-cutoff" : ""}`}>

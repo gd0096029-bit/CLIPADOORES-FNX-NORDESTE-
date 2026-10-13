@@ -2,6 +2,7 @@ import type { RankingEntry } from "@/lib/clipador/types";
 import { PRIZES, prizeForPosition } from "@/lib/clipador/rules";
 import { fmtBRLShort, fmtInt, fmtRelativeDay, monthLabel, plural } from "@/lib/clipador/format";
 import { IconArrowUp, IconBook, IconEye, IconTrophy } from "./icons";
+import { Podium } from "./Podium";
 
 interface Props {
   month: string;
@@ -69,9 +70,12 @@ export function RankingTab({ month, ranking, meId, lastCheckAt, daysLeft, positi
         </div>
       )}
 
-      <ol className="ranking">
-        {ranking.map((e, i) => {
-          const pos = i + 1;
+      <Podium ranking={ranking} meId={meId} onSelect={onSelectClipper} />
+
+      {ranking.length > 3 && <h3 className="list-title">Do 4º lugar em diante</h3>}
+      <ol className="ranking" start={4}>
+        {ranking.slice(3).map((e, i) => {
+          const pos = i + 4;
           const prize = prizeForPosition(pos);
           const isMe = e.clipperId === meId;
           const pct = Math.max(2, Math.round((e.views / leader) * 100));

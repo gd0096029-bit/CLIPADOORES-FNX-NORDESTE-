@@ -2790,3 +2790,212 @@ html {
 .btn-ghost {
   background: rgba(26, 18, 12, 0.78);
 }
+
+/* =========================================================
+   Pódio do top 3
+   ========================================================= */
+.podium {
+  list-style: none;
+  margin: 8px 0 24px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  max-width: 760px;
+  margin-inline: auto;
+}
+.podium-spot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.podium-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 12px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: center;
+  cursor: default;
+  border-radius: 12px;
+  min-width: 0;
+}
+button.podium-person {
+  cursor: pointer;
+}
+button.podium-person:hover .podium-name {
+  color: var(--accent-hover);
+}
+.podium-crown {
+  color: var(--gold);
+  filter: drop-shadow(0 0 10px rgba(242, 179, 61, 0.55));
+}
+.podium-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  background: var(--surface-2);
+  border: 3px solid var(--line-strong);
+  color: var(--ink);
+}
+.place-1 .podium-avatar {
+  width: 80px;
+  height: 80px;
+  font-size: 30px;
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(242, 179, 61, 0.15), 0 10px 30px -10px rgba(242, 179, 61, 0.6);
+}
+.place-2 .podium-avatar {
+  border-color: var(--silver);
+  color: var(--silver);
+}
+.place-3 .podium-avatar {
+  border-color: var(--bronze);
+  color: var(--bronze);
+}
+.podium-name {
+  font-weight: 700;
+  font-size: 16px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.podium-name .you {
+  margin-left: 6px;
+}
+.podium-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.podium-step {
+  border-radius: 12px 12px 4px 4px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  padding-top: 14px;
+  transform-origin: bottom;
+  animation: podium-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.place-1 .podium-step {
+  height: 150px;
+  background: linear-gradient(180deg, rgba(242, 179, 61, 0.35), rgba(242, 179, 61, 0.08));
+  border-color: var(--gold-line);
+}
+.place-2 .podium-step {
+  height: 112px;
+  background: linear-gradient(180deg, rgba(217, 212, 204, 0.18), rgba(217, 212, 204, 0.04));
+  border-color: var(--silver-line);
+  animation-delay: 0.08s;
+}
+.place-3 .podium-step {
+  height: 88px;
+  background: linear-gradient(180deg, rgba(232, 149, 91, 0.22), rgba(232, 149, 91, 0.05));
+  border-color: var(--bronze-line);
+  animation-delay: 0.16s;
+}
+.podium-place {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.place-1 .podium-place {
+  color: var(--gold);
+  font-size: 48px;
+}
+.place-2 .podium-place {
+  color: var(--silver);
+}
+.place-3 .podium-place {
+  color: var(--bronze);
+}
+.podium-prize {
+  font-weight: 800;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+.podium-spot.is-me .podium-step {
+  box-shadow: inset 0 3px 0 var(--accent);
+}
+.list-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+@keyframes podium-rise {
+  from {
+    transform: scaleY(0.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .podium-step {
+    animation: none;
+  }
+}
+@media (max-width: 680px) {
+  .podium {
+    gap: 6px;
+  }
+  .podium-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+  .place-1 .podium-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 22px;
+  }
+  .podium-name {
+    font-size: 13.5px;
+  }
+  .podium-name .you {
+    display: none;
+  }
+  .podium-views {
+    font-size: 12.5px;
+  }
+  .place-1 .podium-step {
+    height: 118px;
+  }
+  .place-2 .podium-step {
+    height: 90px;
+  }
+  .place-3 .podium-step {
+    height: 72px;
+  }
+  .podium-place {
+    font-size: 28px;
+  }
+  .place-1 .podium-place {
+    font-size: 36px;
+  }
+  .podium-prize {
+    font-size: 13px;
+  }
+}
