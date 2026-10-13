@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import {
   BURNS_ACCOUNT,
-  CHECKLIST,
   COMPETITION_RULES,
   EXAMPLES,
   GOLDEN_RULES,
@@ -11,21 +9,17 @@ import {
   STEPS,
   WARMUP,
 } from "@/lib/clipador/manual";
-import { IconAlert, IconBook, IconCheck, IconPhone } from "./icons";
+import { IconAlert, IconBook, IconPhone } from "./icons";
 
 const SECTIONS = [
   { id: "aquecer", label: "Aquecer conta" },
   { id: "passos", label: "Passo a passo" },
-  { id: "checklist", label: "Checklist" },
   { id: "exemplos", label: "Exemplos" },
   { id: "regras", label: "Regras" },
 ];
 
 /** Aba "Manual": o conteúdo do QG dos Clipadores dentro do site. */
 export function ManualTab({ onOpenRules }: { onOpenRules: () => void }) {
-  const [done, setDone] = useState<Record<number, boolean>>({});
-  const doneCount = Object.values(done).filter(Boolean).length;
-
   function jump(id: string) {
     document.getElementById(`manual-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -93,34 +87,6 @@ export function ManualTab({ onOpenRules }: { onOpenRules: () => void }) {
             </li>
           ))}
         </ol>
-      </section>
-
-      {/* ---------- checklist ---------- */}
-      <section id="manual-checklist" className="manual-section">
-        <p className="eyebrow">Antes de postar</p>
-        <h3 className="manual-h">Checklist do clipe</h3>
-        <div className="checklist-head">
-          <div className="checklist-bar" aria-hidden="true">
-            <span style={{ width: `${(doneCount / CHECKLIST.length) * 100}%` }} />
-          </div>
-          <span className="checklist-count">
-            {doneCount}/{CHECKLIST.length}
-          </span>
-          <button type="button" className="btn btn-ghost btn-xs" onClick={() => setDone({})} disabled={doneCount === 0}>
-            Limpar
-          </button>
-        </div>
-        <ul className="checklist">
-          {CHECKLIST.map((label, i) => (
-            <li key={label}>
-              <button type="button" className={`check-item ${done[i] ? "is-done" : ""}`} aria-pressed={!!done[i]} onClick={() => setDone((d) => ({ ...d, [i]: !d[i] }))}>
-                <span className="check-box">{done[i] && <IconCheck size={16} />}</span>
-                <span>{label}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        {doneCount === CHECKLIST.length && <p className="field-ok">Tudo certo, pode postar!</p>}
       </section>
 
       {/* ---------- exemplos ---------- */}

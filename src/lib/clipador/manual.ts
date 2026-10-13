@@ -118,18 +118,6 @@ export const EXAMPLES: ExampleAccount[] = [
   },
 ];
 
-export const CHECKLIST = [
-  "Gancho começa na frase mais forte, sem enrolação",
-  "Texto do gancho no topo da tela",
-  "Clipe entre 20 e 60 segundos, com começo, meio e fim",
-  'Silêncios e "ééé" cortados',
-  "Legenda revisada, sem erro de português",
-  "Chamada pra ação no final",
-  "Cupom na tela, na descrição e no comentário fixado",
-  "Informação de edital conferida na fonte oficial",
-  "Trecho anotado na planilha do time",
-];
-
 export const COMPETITION_RULES = [
   { title: "Postado no mês da competição.", text: "Post antigo não vale (herda views acumuladas) e é removido automaticamente. O clipe conta no mês em que foi enviado na área. Teu total é a soma das views dos clipes válidos." },
   { title: "Views atualizam sozinhas.", text: "Atualizam ao longo do dia, em todas as plataformas. Pode levar um tempo até o número mais recente aparecer." },
